@@ -40,7 +40,7 @@ readStream stream = do
   res <- PM.readEvents stream
   msgs <- case res of
       Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
-      _        -> ioError $ userError "Could not open midi stream:"
+      _        -> ioError $ userError "Could not read MIDI stream"
   threadDelay 500
   pure msgs
 
