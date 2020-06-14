@@ -39,7 +39,7 @@ makeNetworkDescription addTickEvent addMidiEvent = do
   eTick      <- fromAddHandler addTickEvent
   -- By having an Integer counter, we should never get an overflow
   eCtr       <- accumE (-1 :: Integer) $ eTick $> (+ 1)
-  eFrame     <- makeFrameEvent2 eCtr testAnimation
+  eFrame     <- makeFrameEvent eCtr testAnimation
 
   reactimate'
     $ fmap (putStrLn <$> ("Held notes: " <>) . show . mapMaybe midiToPianoNote)
