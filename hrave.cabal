@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d0ac4e864fff26242c7d13a5f7b66e3962c210361f95ce853c49cd8796bbc56f
+-- hash: 4bbd2e314332b3883bad1e6e231f43f21e20e22e75def179c5dc2b5db8f6592a
 
 name:           hrave
 version:        0.1.0.0
@@ -19,7 +19,6 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -27,6 +26,8 @@ source-repository head
 
 library
   exposed-modules:
+      DataTypes
+      FRP
       Lib
       Midi
       Notes
@@ -40,6 +41,8 @@ library
     , base >=4.7 && <5
     , midi
     , mtl
+    , random
+    , reactive-banana
     , transformers
     , unix
   default-language: Haskell2010
@@ -57,6 +60,8 @@ executable hrave-exe
     , hrave
     , midi
     , mtl
+    , random
+    , reactive-banana
     , transformers
     , unix
   default-language: Haskell2010
@@ -75,6 +80,8 @@ test-suite hrave-test
     , hrave
     , midi
     , mtl
+    , random
+    , reactive-banana
     , transformers
     , unix
   default-language: Haskell2010

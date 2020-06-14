@@ -36,6 +36,7 @@ packages:
 #
 extra-deps:
 - PortMidi-0.2.0.0@sha256:0671e36ec72e95138bf396234b205864a8a6d0ee353e09e01cbfd57004c56f40,2383
+- reactive-banana-1.2.1.0@sha256:af0a41dec95e1478acd5280f0fdde51afddf9fbfa4e0a4c226a2c6fa65702796,3975
 # - acme-missiles-0.3
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a

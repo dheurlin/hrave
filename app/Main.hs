@@ -3,7 +3,9 @@
 module Main where
 
 import           Midi                           ( readDevice
-                                                , getDevice
+                                                , getInputDevice
+                                                , getOutputDevice
+                                                , printDevices
                                                 )
 import           Util                           ( withPM )
 
@@ -16,18 +18,28 @@ import           System.Posix.Signals           ( installHandler
                                                 )
 import qualified Sound.PortMidi                as PM
 
+-- main :: IO ()
+-- main = withPM $ do
+--   mapM_ (print . snd) =<< listDevices
+
 main :: IO ()
 main = withPM $ do
-  device <- getDevice
-  stream <- PM.openInput device
+  output <- getOutputDevice
+  input  <- getInputDevice
 
-  s <- case stream of
-    Left  e -> ioError $ userError $ "Could not open midi stream: " <> show e
-    Right s -> do
+  outputStream <- PM.openOutput 0 output
+  inputStream  <- PM.openInput    input
+  -- let outputStream = Right undefined
+
+  (is, os) <- case (inputStream, outputStream) of
+    (Right is, Right os) -> do
       -- Close the stream if interrupted
-      installHandler sigINT (Catch $ void $ PM.close s) Nothing
-      pure s
+      installHandler sigINT (Catch $ void $ PM.close is >> PM.close os) Nothing
+      pure(is, os)
+    _    -> ioError $ userError "Could not open midi stream:"
 
-  void $ runExceptT $ readDevice s
+  printDevices
+
+  void $ runExceptT $ readDevice is os
 
 

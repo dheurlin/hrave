@@ -10,4 +10,3 @@ withPM io =
   void $ catchIOError (void $ PM.initialize >> io >> PM.terminate) $ \e -> do
     putStrLn $ "An error occured: " <> show e
     void PM.terminate
-
