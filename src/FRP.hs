@@ -29,6 +29,7 @@ import           Reactive.Banana.Frameworks
 
 import qualified Sound.PortMidi                as PM
 
+
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> MomentIO ()
 makeNetworkDescription addTickEvent addMidiEvent = do
@@ -36,17 +37,17 @@ makeNetworkDescription addTickEvent addMidiEvent = do
   held       <- accumB [] $ updateHeldMany <$> eMidi
   eHeld      <- changes held
   eTick      <- fromAddHandler addTickEvent
-  eCtr       <- accumE (-2) $ eTick $> (+ 1)
-  eAnimation <- accumE (Right testAnimation) $ stepAnim' <$> eCtr
-  let eFrame = snd . head <$> filterE
-        (not . null)
-        (either id id <$> filterE isRight eAnimation)
+  -- By having an Integer counter, we should never get an overflow
+  eCtr       <- accumE (-1 :: Integer) $ eTick $> (+ 1)
+  eFrame     <- makeFrameEvent2 eCtr testAnimation
 
   reactimate'
     $ fmap (putStrLn <$> ("Held notes: " <>) . show . mapMaybe midiToPianoNote)
     <$> eHeld
 
+
   -- reactimate' $ fmap putStrLn <$> eFrame
+  reactimate $ print <$> eCtr
   reactimate $ putStrLn <$> eFrame
 
 
@@ -86,21 +87,21 @@ type TimeStamp   = Integer
 type Frame a     = (TimeStamp, a)
 type Animation a = [Frame a]
 
--- Right means the animation has advanced since the previous timestep,
--- Left means it has not
-type AnimationStep a = Either (Animation a) (Animation a)
 
-stepAnim' :: TimeStamp -> AnimationStep a -> AnimationStep a
-stepAnim' now a = case either id id a of
-  anim@((time, _):xs) -> case time of
-                           t | t == now -> Right xs
-                             | t == 0   -> Right anim
-                           _            -> Left anim
-  []                  -> Left []
+-- | Advances the animation by one step if the correct point in time has been
+-- reached, and returns (currentFrame, rest). If the correct point in time
+-- has not been reached, returns (Nothing, rest)
+stepAnim :: TimeStamp -> (Maybe a, Animation a) -> (Maybe a, Animation a)
+stepAnim now (_, [])                  = (Nothing, [])
+stepAnim now (_, anim@((time, a):xs))
+  | now == time = (Just a, xs)
+  | otherwise   = (Nothing, anim)
 
+makeFrameEvent :: Event TimeStamp -> Animation a -> MomentIO (Event a)
+makeFrameEvent eCounter anim = do
+  eAnimation <- accumE (Nothing, anim) $ stepAnim <$> eCounter
+  pure $ fromJust . fst <$> filterE (isJust . fst) eAnimation
 
-animStart :: Animation a -> (a, Animation a)
-animStart anim = (snd . head $ anim, tail anim)
 
 testAnimation :: Animation String
 testAnimation =
