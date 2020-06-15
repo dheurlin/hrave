@@ -9,6 +9,8 @@ import           Notes
 import           DataTypes
 import           Animations
 
+import           Foreign.C.Types                ( CLong )
+
 import           Control.Monad
 import           Data.Maybe
 import           Data.Either
@@ -31,69 +33,57 @@ import           Reactive.Banana.Frameworks
 
 import qualified Sound.PortMidi                as PM
 
-ta :: Animation String
-ta = cycleAnimation Nothing $ Animation
-  [ (0, "Sagan om bajsmannen, del 2")
-  , (1, "Den här gången lite bajsenödigare")
-  , (1, "En kort paus nu då...")
-  , (4, "..Och så kör vi igen!")
+-- bass :: Animation [MidiMessage]
+-- bass = cycleAnimation (Just 8)
+--   $ Animation [(0, [noteAOff, noteDOn]), (8, [noteDOff, noteAOn])]
+--  where
+--   noteDOn =
+--     MidiMessage 1 $ NoteOn (pianoNoteToMidi $ PianoNote D NoteNormal 1) 100
+--   noteDOff =
+--     MidiMessage 1 $ NoteOff (pianoNoteToMidi $ PianoNote D NoteNormal 1) 100
+
+--   noteAOn =
+--     MidiMessage 1 $ NoteOn (pianoNoteToMidi $ PianoNote A NoteNormal 2) 100
+--   noteAOff =
+--     MidiMessage 1 $ NoteOff (pianoNoteToMidi $ PianoNote A NoteNormal 2) 100
+
+
+data BeatUnit = BeatOn | BeatOff
+  deriving ( Show )
+
+beatToMidi :: CLong -> [Note] -> BeatUnit -> [MidiMessage]
+beatToMidi channel ns BeatOn =
+  [ MidiMessage channel $ NoteOn note 100 | note <- ns ]
+beatToMidi channel ns BeatOff =
+  [ MidiMessage channel $ NoteOff note 100 | note <- [0 .. 127] ]
+
+
+beat :: Animation BeatUnit
+beat = cycleAnimation Nothing $ Animation
+  [ (0, BeatOn) , (2, BeatOff)
+  , (2, BeatOn) , (2, BeatOff)
+  , (2, BeatOn), (2, BeatOff)
+  , (5, BeatOff)
   ]
-
-chords :: Animation [MidiMessage]
-chords = cycleAnimation Nothing $ Animation
-  [ (0, chordOn) , (2, chordOff)
-  , (2, chordOn) , (2, chordOff)
-  , (2, chordOn), (2, chordOff)
-  , (5, chordOff)
-  ]
- where
-  noteD  = pianoNoteToMidi $ PianoNote D NoteNormal 2
-  noteFs = pianoNoteToMidi $ PianoNote F NoteSharp 2
-  noteA  = pianoNoteToMidi $ PianoNote A NoteNormal 3
-
-  mkChord t =
-    [ MidiMessage 0 (t noteD 100)
-    , MidiMessage 0 (t noteFs 100)
-    , MidiMessage 0 (t noteA 100)
-    ]
-
-  chordOn  = mkChord NoteOn
-  chordOff = mkChord NoteOff
-
-bass :: Animation [MidiMessage]
-bass = cycleAnimation (Just 8)
-  $ Animation [(0, [noteAOff, noteDOn]), (8, [noteDOff, noteAOn])]
- where
-  noteDOn =
-    MidiMessage 1 $ NoteOn (pianoNoteToMidi $ PianoNote D NoteNormal 1) 100
-  noteDOff =
-    MidiMessage 1 $ NoteOff (pianoNoteToMidi $ PianoNote D NoteNormal 1) 100
-
-  noteAOn =
-    MidiMessage 1 $ NoteOn (pianoNoteToMidi $ PianoNote A NoteNormal 2) 100
-  noteAOff =
-    MidiMessage 1 $ NoteOff (pianoNoteToMidi $ PianoNote A NoteNormal 2) 100
 
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
 makeNetworkDescription addTickEvent addMidiEvent outputStream = do
-  eMidi      <- fromAddHandler addMidiEvent
-  held       <- accumB [] $ updateHeldMany <$> eMidi
-  eHeld      <- changes held
-  eTick      <- fromAddHandler addTickEvent
+  -- Set up counter
+  eTick <- fromAddHandler addTickEvent
   -- By having an Integer counter, we should never get an overflow
-  eCtr       <- accumE (-1 :: Integer) $ eTick $> (+ 1)
-  -- eFrame     <- makeFrameEvent eCtr testAnimation
-  eFrame     <- makeFrameEvent eCtr (toAbsAnimation chords)
-  eBass      <- makeFrameEvent eCtr (toAbsAnimation bass)
+  eCtr  <- accumE (-1 :: Integer) $ eTick $> (+ 1)
 
-  reactimate'
-    $ fmap (putStrLn <$> ("Held notes: " <>) . show . mapMaybe midiToPianoNote)
-    <$> eHeld
+  eMidi <- fromAddHandler addMidiEvent          -- stream of midi events
+  held  <- accumB [] $ updateHeldMany <$> eMidi -- currently held notes
 
-  -- reactimate $ print <$> eCtr
-  reactimate $ writeStream outputStream <$> eFrame
-  reactimate $ writeStream outputStream <$> eBass
+  eBeat <- makeFrameEvent eCtr (toAbsAnimation beat)
+  let eChordBeat = beatToMidi 0 <$> held <@> eBeat
+
+  reactimate $ writeStream outputStream <$> eChordBeat
+  -- reactimate
+  --   $ (putStrLn <$> ("Held notes: " <>) . show . mapMaybe midiToPianoNote)
+  --   <$> eHeld
 
 
 setup :: IO ()
