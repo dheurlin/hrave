@@ -46,15 +46,15 @@ cycleAnimation pause (Animation xs) = Animation $ zip cTimes cFrames
 -- | Advances the animation by one step if the correct point in time has been
 -- reached, and returns (currentFrame, rest). If the correct point in time
 -- has not been reached, returns (Nothing, rest)
-stepAnim :: TimeStamp -> (Maybe a, AbsAnimation a) -> (Maybe a, AbsAnimation a)
-stepAnim now (_, AbsAnimation []) = (Nothing, AbsAnimation [])
-stepAnim now (_, (AbsAnimation anim@((time, a) : xs)))
+stepAnim :: TimeStamp -> AbsAnimation a -> (Maybe a, AbsAnimation a)
+stepAnim now (AbsAnimation []) = (Nothing, AbsAnimation [])
+stepAnim now (AbsAnimation anim@((time, a) : xs))
   | now == time = (Just a, AbsAnimation xs)
   | otherwise   = (Nothing, AbsAnimation anim)
 
 makeFrameEvent :: Event TimeStamp -> AbsAnimation a -> MomentIO (Event a)
 makeFrameEvent eCounter anim = do
-  eAnimation <- accumE (Nothing, anim) $ stepAnim <$> eCounter
+  eAnimation <- accumE (Nothing, anim) $ (. snd) . stepAnim <$> eCounter
   pure $ fromJust . fst <$> filterE (isJust . fst) eAnimation
 
 toAbsAnimation :: Animation a -> AbsAnimation a
@@ -62,12 +62,3 @@ toAbsAnimation (Animation xs) = AbsAnimation $ zip absoluteTimes frames
  where
   (times, frames) = unzip xs
   absoluteTimes   = tail $ scanl (+) 0 times
-
-
-testAnimation :: AbsAnimation String
-testAnimation = AbsAnimation
-  [ (0, "Det var en gång en bajsman")
-  , (1, "Han hette bajsmannen")
-  , (3, "En gång skulle han bajsa...")
-  , (6, "Han gjorde det i NC")
-  ]
