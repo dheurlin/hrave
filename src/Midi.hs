@@ -1,4 +1,5 @@
 {-# LANGUAGE BinaryLiterals     #-}
+{-# LANGUAGE LambdaCase         #-}
 {-# LANGUAGE NumericUnderscores #-}
 
 module Midi where
@@ -37,13 +38,18 @@ readDevice input output = do
 
 readStream :: PM.PMStream -> IO [MidiMessage]
 readStream stream = do
-  res <- PM.readEvents stream
+  res  <- PM.readEvents stream
   msgs <- case res of
-      Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
-      _        -> ioError $ userError "Could not read MIDI stream"
+    Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
+    _        -> ioError $ userError "Could not read MIDI stream"
   threadDelay 500
   pure msgs
 
+writeStream :: PM.PMStream -> [MidiMessage] -> IO ()
+writeStream stream msgs =
+  (PM.writeEvents stream =<< toEvents msgs) >>= \case
+    Right _ -> pure ()
+    Left  _ -> ioError $ userError "Could not write MIDI stream"
 
 listDevices :: IO [(Int, PM.DeviceInfo)]
 listDevices =
@@ -76,7 +82,16 @@ openInputStream = do
 
   case inputStream of
     (Right is) -> pure is
-    _          -> ioError $ userError "Could not open midi stream:"
+    _          -> ioError $ userError "Could not open midi input stream:"
+
+openOutputStream :: IO PM.PMStream
+openOutputStream = do
+  output       <- getOutputDevice
+  outputStream <- PM.openOutput 0 output
+
+  case outputStream of
+    (Right os) -> pure os
+    _          -> ioError $ userError "Could not open midi ouput stream:"
 
 
 isNoteOn :: PM.PMEvent -> Bool
@@ -84,6 +99,11 @@ isNoteOn (PM.PMEvent msg _) = status .&. 0xF0 == 0b1001_0000
   where (PM.PMMsg status _ _) = PM.decodeMsg msg
 
 
+fromMessage :: MidiMessage -> PM.PMMsg
+fromMessage (MidiMessage channel (NoteOff note velocity))
+  = PM.PMMsg (0b1000_0000 .|. channel) note velocity
+fromMessage (MidiMessage channel (NoteOn note velocity))
+  = PM.PMMsg (0b1001_0000 .|. channel) note velocity
 
 toMessage :: PM.PMMsg -> Maybe MidiMessage
 toMessage (PM.PMMsg status data1 data2)
@@ -93,6 +113,14 @@ toMessage (PM.PMMsg status data1 data2)
   = Just $ MidiMessage (status .&. 0xF) (NoteOn data1 data2)
   | otherwise
   = Nothing
+
+toEvent :: MidiMessage -> IO PM.PMEvent
+toEvent midiMsg = PM.PMEvent (PM.encodeMsg $ fromMessage midiMsg) <$> PM.time
+
+toEvents :: [MidiMessage] -> IO [PM.PMEvent]
+toEvents midiMsgs = do
+  time <- PM.time
+  pure [PM.PMEvent (PM.encodeMsg $ fromMessage msg) time | msg <- midiMsgs ]
 
 updateHeld :: MidiMessage -> [Note] -> [Note]
 updateHeld (MidiMessage _ (NoteOn n _))  held = n : held

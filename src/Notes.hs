@@ -2,6 +2,9 @@ module Notes where
 
 import DataTypes
 
+import Data.List
+import Data.Maybe
+
 pianoNotes :: [PianoNote]
 pianoNotes =
   concat
@@ -24,3 +27,6 @@ midiToPianoNote :: Note -> Maybe PianoNote
 midiToPianoNote n
   | n < 21    = Nothing
   | otherwise = Just $ pianoNotes !! fromIntegral (n - 21)
+
+pianoNoteToMidi :: PianoNote -> Note
+pianoNoteToMidi note = fromIntegral $ fromJust (elemIndex note pianoNotes) + 21
