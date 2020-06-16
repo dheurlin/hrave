@@ -31,6 +31,7 @@ type Frame a  = (Duration, a)
 -- | An animation with relative timestaps.
 -- Must be converted to 'AbsAnimation' to be played
 newtype Animation a  =  Animation [Frame a]
+  deriving Show
 
 unAnimation :: Animation a -> [AbsFrame a]
 unAnimation (Animation xs) = xs

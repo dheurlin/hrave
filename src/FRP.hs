@@ -3,6 +3,7 @@
 
 module FRP where
 
+import           Config
 import           Util
 import           Midi
 import           Notes
@@ -35,17 +36,22 @@ import           Reactive.Banana.Frameworks
 import qualified Sound.PortMidi                as PM
 
 
+-- TODO let this be changed dynamically
+bpm = 100
+
+
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
 makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eTick <- fromAddHandler addTickEvent
   -- By having an Integer counter, we should never get an overflow
-  eCtr  <- accumE (-1 :: Integer) $ eTick $> (+ 1)
+  eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1)
 
   eMidi <- fromAddHandler addMidiEvent          -- stream of midi events
   held  <- accumB [] $ updateHeldMany <$> eMidi -- currently held notes
 
-  eBeat <- makeFrameEvent eCtr (toAbsAnimation beat)
+  eBeat <- makeFrameEvent eCtr (toAbsAnimation testBeat)
+  -- eBeat <- makeFrameEvent eCtr (toAbsAnimation beat)
   let eChordBeat = beatToMidi 0 <$> held <@> eBeat
 
   reactimate $ writeStream outputStream <$> eChordBeat
@@ -87,7 +93,8 @@ makeTick = do
   (addTickEvent, tick) <- newAddHandler
 
   tid <- forkIO . forever $ do
-    threadDelay 100_000
+    threadDelay (tickPeriod bpm)
+    -- threadDelay 100_000
     tick ()
 
   pure (addTickEvent, tick, tid)

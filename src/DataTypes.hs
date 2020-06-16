@@ -4,6 +4,8 @@ module DataTypes where
 
 import           Foreign.C.Types                ( CLong )
 
+type Tick = Integer
+
 class Empty a where
   emptyElem :: a
 
