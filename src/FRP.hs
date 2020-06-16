@@ -8,6 +8,7 @@ import           Midi
 import           Notes
 import           DataTypes
 import           Animations
+import           Beats
 
 import           Foreign.C.Types                ( CLong )
 
@@ -33,43 +34,10 @@ import           Reactive.Banana.Frameworks
 
 import qualified Sound.PortMidi                as PM
 
--- bass :: Animation [MidiMessage]
--- bass = cycleAnimation (Just 8)
---   $ Animation [(0, [noteAOff, noteDOn]), (8, [noteDOff, noteAOn])]
---  where
---   noteDOn =
---     MidiMessage 1 $ NoteOn (pianoNoteToMidi $ PianoNote D NoteNormal 1) 100
---   noteDOff =
---     MidiMessage 1 $ NoteOff (pianoNoteToMidi $ PianoNote D NoteNormal 1) 100
-
---   noteAOn =
---     MidiMessage 1 $ NoteOn (pianoNoteToMidi $ PianoNote A NoteNormal 2) 100
---   noteAOff =
---     MidiMessage 1 $ NoteOff (pianoNoteToMidi $ PianoNote A NoteNormal 2) 100
-
-
-data BeatUnit = BeatOn | BeatOff
-  deriving ( Show )
-
-beatToMidi :: CLong -> [Note] -> BeatUnit -> [MidiMessage]
-beatToMidi channel ns BeatOn =
-  [ MidiMessage channel $ NoteOn note 100 | note <- ns ]
-beatToMidi channel ns BeatOff =
-  [ MidiMessage channel $ NoteOff note 100 | note <- [0 .. 127] ]
-
-
-beat :: Animation BeatUnit
-beat = cycleAnimation Nothing $ Animation
-  [ (0, BeatOn) , (2, BeatOff)
-  , (2, BeatOn) , (2, BeatOff)
-  , (2, BeatOn), (2, BeatOff)
-  , (5, BeatOff)
-  ]
 
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
 makeNetworkDescription addTickEvent addMidiEvent outputStream = do
-  -- Set up counter
   eTick <- fromAddHandler addTickEvent
   -- By having an Integer counter, we should never get an overflow
   eCtr  <- accumE (-1 :: Integer) $ eTick $> (+ 1)
@@ -111,6 +79,7 @@ setup = withPM $ do
        )
     >> threadDelay 500
     )
+  putStrLn "Exited"
 
 
 makeTick :: IO (AddHandler (), Handler () ,ThreadId)
@@ -123,3 +92,7 @@ makeTick = do
 
   pure (addTickEvent, tick, tid)
 
+-- makeTickEvent
+--   :: Int -- Initial delay
+--   -> Event (Int -> Int) -- Change delay
+--   -> MomentIO (Event ())

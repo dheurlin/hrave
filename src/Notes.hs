@@ -4,6 +4,8 @@ import DataTypes
 
 import Data.List
 import Data.Maybe
+import Data.Char
+import Text.Read
 
 pianoNotes :: [PianoNote]
 pianoNotes =
@@ -30,3 +32,26 @@ midiToPianoNote n
 
 pianoNoteToMidi :: PianoNote -> Note
 pianoNoteToMidi note = fromIntegral $ fromJust (elemIndex note pianoNotes) + 21
+
+pn :: String -> PianoNote
+pn = pn'
+ where
+  pn' n@[note, '#', oct]
+    | not (okNote note) = e n
+    | not (okOct oct)   = e n
+    | badMod note       = e n
+    | otherwise         = PianoNote (read [note]) NoteSharp (read [oct])
+  pn' n@[note, oct]
+    | not (okNote note) = e n
+    | not (okOct oct)   = e n
+    | otherwise         = PianoNote (read [note]) NoteNormal (read [oct])
+  pn' n           = e n
+
+  okNote c = isJust (readMaybe [c] :: Maybe NoteName)
+  okOct c = isDigit c && i >= 0 && i <= 9 where i = read [c] :: Octave
+  badMod 'B' = True
+  badMod 'E' = True
+  badMod _   = False
+
+  e n = error $ "Invalid note name: " <> n
+
