@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5f08c251c1b148c8f4b068e515efab9a03f39eb44b6b4947034087e3fc51ce8a
+-- hash: 22de253fb08b3d59f8fe08d52025c04491ae8bcca7c38637e7881f7545bdf51a
 
 name:           hrave
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       Animations
+      Beats
       DataTypes
       FRP
       Lib
