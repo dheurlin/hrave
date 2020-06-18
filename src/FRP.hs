@@ -10,6 +10,7 @@ import           Notes
 import           DataTypes
 import           Animations
 import           Beats
+import           Chords
 
 import           Foreign.C.Types                ( CLong )
 
@@ -49,12 +50,24 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
 
   eMidi <- fromAddHandler addMidiEvent          -- stream of midi events
   held  <- accumB [] $ updateHeldMany <$> eMidi -- currently held notes
+  let chord = toChord <$> held
+  eChord <- changes chord
 
-  eBeat <- makeFrameEvent eCtr (toAbsAnimation testBeat)
-  -- eBeat <- makeFrameEvent eCtr (toAbsAnimation beat)
+  eBeat     <- makeFrameEvent eCtr (toAbsAnimation testBeat)
+  eTickFun  <- makeFrameEvent eCtr (toAbsAnimation beatAnim)
+
   let eChordBeat = beatToMidi 0 <$> held <@> eBeat
+  let eClick     = beatToMidi 9 [42] <$> eBeat
+  let eTickBeat = map (\f -> f 9 100) <$> eTickFun
 
   reactimate $ writeStream outputStream <$> eChordBeat
+  -- reactimate $ writeStream outputStream <$> eTickBeat
+  reactimate $ writeStream outputStream <$> eClick
+
+  reactimate' $ fmap print <$> eChord
+
+
+
   -- reactimate
   --   $ (putStrLn <$> ("Held notes: " <>) . show . mapMaybe midiToPianoNote)
   --   <$> eHeld
