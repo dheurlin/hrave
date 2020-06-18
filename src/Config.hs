@@ -6,8 +6,8 @@ import DataTypes
 ticksPerMeasure :: Tick
 -- ticksPerMeasure = 2048
 -- ticksPerMeasure = 1024
--- ticksPerMeasure = 512
-ticksPerMeasure = 256
+ticksPerMeasure = 512
+-- ticksPerMeasure = 256
 
 tickPeriod :: Integer -> Int
 tickPeriod bpm =

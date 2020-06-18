@@ -17,6 +17,7 @@ data BeatUnit = BeatOn | BeatOff | BeatEmpty
 instance Empty BeatUnit where
   emptyElem = BeatEmpty
 
+-- TODO should also take velocity as argument
 beatToMidi :: CLong -> [Note] -> BeatUnit -> [MidiMessage]
 beatToMidi channel ns BeatOn =
   [ MidiMessage channel $ NoteOn note 100 | note <- ns ]
@@ -35,7 +36,7 @@ instance BeatRep () where
   beatOn               = const BeatOn
 
 instance BeatRep [Note] where
-  type BeatContents [Note] = [MidiChannel -> Velocity -> MidiMessage]
+  type BeatContents [Note] = [MidiFunc]
   beatOff                  = map noteOnMsg
   beatOn                   = map noteOffMsg
 
@@ -48,7 +49,7 @@ data NoteRole a = NNote a | NPause
 data NoteDuration = DWhole
                   | DHalf
                   | DQuarter
-                  | DEight
+                  | DEighth
                   | DSixteenth
                   | DDotted NoteDuration
   deriving ( Eq, Show )
@@ -78,7 +79,7 @@ durationToTicks :: NoteDuration -> Tick
 durationToTicks DWhole      = ticksPerMeasure
 durationToTicks DHalf       = ticksPerMeasure `div` 2
 durationToTicks DQuarter    = ticksPerMeasure `div` 4
-durationToTicks DEight      = ticksPerMeasure `div` 8
+durationToTicks DEighth     = ticksPerMeasure `div` 8
 durationToTicks DSixteenth  = ticksPerMeasure `div` 16
 durationToTicks (DDotted d) = (3 * durationToTicks d) `div` 2
 
@@ -90,7 +91,7 @@ roleToTimes
   => Tick       -- ^ Number of ticks to fit the note into
   -> NoteRole a -- ^ The note to convert
   -> Animation b
-roleToTimes ticks (NNote a) = Animation [(ticks - 1, beatOn a), (1, beatOff a)]
+roleToTimes ticks (NNote a) = Animation [(ticks - 3, beatOn a), (3, beatOff a)]
 roleToTimes ticks NPause    = pauseAnim ticks
 
 compileNote
@@ -115,7 +116,7 @@ beat :: Animation BeatUnit
 beat = cycleAnimation $ Animation
   [ (3, BeatOn) , (1, BeatOff)
   , (3, BeatOn) , (1, BeatOff)
-  , (3, BeatOn), (1, BeatOff)
+  , (3, BeatOn) , (1, BeatOff)
   , pauseFrame 4
   ]
 
@@ -125,7 +126,7 @@ testSequence = Sequence
   [ mkNote () DSixteenth
   , mkPause   DSixteenth
   , mkNote () DSixteenth
-  , mkPause   DEight
+  , mkPause   DEighth
   , mkNote () DSixteenth
   , mkPause   DSixteenth
   , mkNote () DSixteenth
@@ -139,5 +140,19 @@ testSequence = Sequence
   , mkPause   DSixteenth
   ]
 
+printAnim :: Show a => Int -> Animation a -> IO ()
+printAnim n (Animation as) = mapM_ print $ take n as
+
+sumDurations :: Animation a -> Integer
+sumDurations (Animation as) = sum . map fst $ as
+
 testBeat :: Animation BeatUnit
 testBeat = cycleAnimation $ compileSequence testSequence
+
+-- 42 F#1 Closed Hi Hat
+
+tickSeq :: Sequence [Note]
+tickSeq = Sequence [ mkNote [42] DQuarter ]
+
+beatAnim :: Animation [MidiFunc]
+beatAnim = cycleAnimation $ compileSequence tickSeq

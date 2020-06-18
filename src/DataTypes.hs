@@ -48,3 +48,4 @@ noteOnMsg n c v = MidiMessage c $ NoteOn n v
 noteOffMsg :: Note -> MidiChannel -> Velocity -> MidiMessage
 noteOffMsg n c v = MidiMessage c $ NoteOff n 0
 
+type MidiFunc = MidiChannel -> Velocity -> MidiMessage

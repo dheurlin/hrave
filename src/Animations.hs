@@ -78,6 +78,8 @@ stepAnim now (AbsAnimation anim@((time, a) : xs))
   | now == time = (Just a, AbsAnimation xs)
   | otherwise   = (Nothing, AbsAnimation anim)
 
+-- | Given a frame counting event, returns an event which emits frames as the
+-- counter reaches the point at which that frame should be displayed
 makeFrameEvent :: Event TimeStamp -> AbsAnimation a -> MomentIO (Event a)
 makeFrameEvent eCounter anim = do
   eAnimation <- accumE (Nothing, anim) $ (. snd) . stepAnim <$> eCounter
@@ -88,13 +90,3 @@ toAbsAnimation (Animation xs) = AbsAnimation $ zip absoluteTimes frames
  where
   (times, frames) = unzip xs
   absoluteTimes   = scanl (+) 0 times
-
-
-test :: AbsAnimation String
-test = toAbsAnimation $ Animation
-  [ (1, "TEst 1\n")                    -- 0
-  , (1, "Test 2\n")                    -- 1
-  , (2, "Nu kommer pausen...\n")       -- 2
-  , (10, "")                           -- 4
-  , (1, "Och där var den över!\n")     -- 14
-  ]
