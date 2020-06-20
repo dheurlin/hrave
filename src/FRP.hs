@@ -48,10 +48,11 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   -- By having an Integer counter, we should never get an overflow
   eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1)
 
-  eMidi <- fromAddHandler addMidiEvent          -- stream of midi events
-  held  <- accumB [] $ updateHeldMany <$> eMidi -- currently held notes
-  let chord = toChord <$> held
-  eChord <- changes chord
+  eMidi         <- fromAddHandler addMidiEvent          -- stream of midi events
+  eHeldAndChord <- accumE ([], Nothing) $ updateHeldChordMany <$> eMidi
+  -- held   <- accumB [] $ updateHeldMany <$> eMidi -- currently held notes
+  held   <- stepper [] $ fst <$> eHeldAndChord
+  chord  <- stepper (Chord 49 MajorChord) $ filterJust $ snd <$> eHeldAndChord
 
   eBeat     <- makeFrameEvent eCtr (toAbsAnimation testBeat)
   eTickFun  <- makeFrameEvent eCtr (toAbsAnimation beatAnim)
@@ -60,11 +61,15 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   let eClick     = beatToMidi 9 [42] <$> eBeat
   let eTickBeat = map (\f -> f 9 100) <$> eTickFun
 
-  reactimate $ writeStream outputStream <$> eChordBeat
-  -- reactimate $ writeStream outputStream <$> eTickBeat
-  reactimate $ writeStream outputStream <$> eClick
+  eChord <- changes chord
+  eHeld <- changes held
 
   reactimate' $ fmap print <$> eChord
+  reactimate' $ fmap print <$> eHeld
+
+  -- reactimate $ writeStream outputStream <$> eChordBeat
+  -- reactimate $ writeStream outputStream <$> eTickBeat
+  -- reactimate $ writeStream outputStream <$> eClick
 
 
 

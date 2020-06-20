@@ -2,6 +2,7 @@ module Chords where
 
 import           DataTypes
 import           Notes
+import           Midi
 
 import           Foreign.C.Types                ( CLong )
 import           Data.List
@@ -13,10 +14,11 @@ data ChordQuality = MajorChord
                   | MajSeventh
                   | MinSeventh
                   | UnknownChord
-  deriving ( Show )
+                  -- TODO More chord qualities
+  deriving ( Eq, Show )
 
 data Chord = Chord { rootNote :: Note, chordQuality :: ChordQuality }
-  deriving ( Show )
+  deriving ( Eq, Show )
 
 
 type NoteInterval = CLong
@@ -27,6 +29,7 @@ toChord ns = Just $ Chord root quality
  where
   inversions =
     [ (n, toQuality $ sort $ map ((`mod` 12) . subtract n) ns) | n <- ns ]
+
   firstJust []                 = Nothing
   firstJust ((n, Just q) : xs) = Just (n, q)
   firstJust (x           : xs) = firstJust xs
@@ -52,3 +55,37 @@ testMajor =
   , pianoNoteToMidi $ pn "A2"
   , pianoNoteToMidi $ pn "F#2"
   ]
+
+-- TODO updateHeldChord still seems problematic, as it often changes a major
+-- chord to a minor chord or vice versa when keys are released.
+--
+-- Possible solutions:
+-- 1. Add a delay for noteOff events so that events that happen in quick
+--    succession will be registered at same time
+-- 2. Don't allow change of chord quality without first lifting all notes
+--
+-- I think I prefer 2. since it's easier to implement and might not affect
+-- convenience that much
+
+-- | Updates the record of which notes are held and what chord was last played
+updateHeldChord :: MidiMessage -> ([Note], Maybe Chord) -> ([Note], Maybe Chord)
+updateHeldChord msgs (heldOld, chordOld) = (heldNew, chordNew)
+  where
+    heldNew = updateHeld msgs heldOld
+    chordNew
+      | length heldNew >= length heldOld = toChord heldNew
+      | Just c <- toChord heldNew,
+        chordQuality c /= UnknownChord   = Just c
+      | otherwise                        = chordOld
+
+updateHeldChordMany
+  :: [MidiMessage] -> ([Note], Maybe Chord) -> ([Note], Maybe Chord)
+updateHeldChordMany = flip $ foldl (flip updateHeldChord)
+
+-- updateHeld :: MidiMessage -> [Note] -> [Note]
+-- updateHeld (MidiMessage _ (NoteOn n _))  held = n : held
+-- updateHeld (MidiMessage _ (NoteOff n _)) held = filter (/= n) held
+-- updateHeld _ held = held
+
+-- updateHeldMany :: [MidiMessage] -> [Note] -> [Note]
+-- updateHeldMany = flip $ foldl (flip updateHeld)
