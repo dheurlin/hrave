@@ -20,80 +20,6 @@ import           System.IO.Error
 
 import           Data.Bits
 
-readDevice :: PM.PMStream -> PM.PMStream -> ExceptT PM.PMError IO ()
-readDevice input output = do
-
-  forever $ do
-    msgs <- ExceptT (PM.readEvents input)
-
-    liftIO $ mapM_ printMessage msgs
-    liftIO $ PM.writeEvents output $ filter isNoteOn msgs
-    -- liftIO . mapM_ printMessage =<< ExceptT (PM.readEvents stream)
-    liftIO $ threadDelay 500
-
-  void $ liftIO $ PM.close input
-
- where
-  printMessage = putStr . showEvent . PM.decodeMsg . PM.message
-
-readStream :: PM.PMStream -> IO [MidiMessage]
-readStream stream = do
-  res  <- PM.readEvents stream
-  msgs <- case res of
-    Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
-    _        -> ioError $ userError "Could not read MIDI stream"
-  threadDelay 500
-  pure msgs
-
-writeStream :: PM.PMStream -> [MidiMessage] -> IO ()
-writeStream stream msgs =
-  (PM.writeEvents stream =<< toEvents msgs) >>= \case
-    Right _ -> pure ()
-    Left  _ -> ioError $ userError "Could not write MIDI stream"
-
-listDevices :: IO [(Int, PM.DeviceInfo)]
-listDevices =
-  zip [0 ..] <$> (mapM PM.getDeviceInfo =<< zeroTill <$> PM.countDevices)
-  where zeroTill n = [0 .. n - 1]
-
-printDevices :: IO ()
-printDevices = mapM_ (print . snd) =<< listDevices
-
-getDevice :: (PM.DeviceInfo -> Bool) -> IO PM.DeviceID
-getDevice selector =
-  fromIntegral . fst . head . filter (selector . snd) <$> listDevices
-
--- The input MIDI device is hardcoded to my MIDI controller atm
-getInputDevice :: IO PM.DeviceID
-getInputDevice = getDevice $ \d -> take 5 (PM.name d) == "CASIO" && PM.input d
-
-getOutputDevice :: IO PM.DeviceID
-getOutputDevice = do
-  d <- getDevice $ \d -> (PM.name d == "VirMIDI 0-1") && PM.input d
-  putStrLn $  "output device: " <> show d
-  pure d
-
-
-
-openInputStream :: IO PM.PMStream
-openInputStream = do
-  input       <- getInputDevice
-  inputStream <- PM.openInput input
-
-  case inputStream of
-    (Right is) -> pure is
-    _          -> ioError $ userError "Could not open midi input stream:"
-
-openOutputStream :: IO PM.PMStream
-openOutputStream = do
-  output       <- getOutputDevice
-  outputStream <- PM.openOutput 0 output
-
-  case outputStream of
-    (Right os) -> pure os
-    _          -> ioError $ userError "Could not open midi ouput stream:"
-
-
 isNoteOn :: PM.PMEvent -> Bool
 isNoteOn (PM.PMEvent msg _) = status .&. 0xF0 == 0b1001_0000
   where (PM.PMMsg status _ _) = PM.decodeMsg msg
@@ -137,3 +63,107 @@ showEvent (PM.PMMsg status data1 data2)
   | status .&. 0xF0 == 0b1001_0000
     = "Noteon: " <> maybe "" show (midiToPianoNote $ fromIntegral data1) <> "\n"
   | otherwise = ""
+
+readDevice :: PM.PMStream -> PM.PMStream -> ExceptT PM.PMError IO ()
+readDevice input output = do
+
+  forever $ do
+    msgs <- ExceptT (PM.readEvents input)
+
+    liftIO $ mapM_ printMessage msgs
+    liftIO $ PM.writeEvents output $ filter isNoteOn msgs
+    -- liftIO . mapM_ printMessage =<< ExceptT (PM.readEvents stream)
+    liftIO $ threadDelay 500
+
+  void $ liftIO $ PM.close input
+
+ where
+  printMessage = putStr . showEvent . PM.decodeMsg . PM.message
+
+readStream :: PM.PMStream -> IO [MidiMessage]
+readStream stream = do
+  res  <- PM.readEvents stream
+  msgs <- case res of
+    Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
+    _        -> ioError $ userError "Could not read MIDI stream"
+  threadDelay 500
+  pure msgs
+
+writeStream :: PM.PMStream -> [MidiMessage] -> IO ()
+writeStream stream msgs =
+  (PM.writeEvents stream =<< toEvents msgs) >>= \case
+    Right _ -> pure ()
+    Left  _ -> ioError $ userError "Could not write MIDI stream"
+
+------ Printing and choosing input and output ---------------------------------
+
+listDevices :: IO [(Int, PM.DeviceInfo)]
+listDevices =
+  zip [0 ..] <$> (mapM PM.getDeviceInfo =<< zeroTill <$> PM.countDevices)
+  where zeroTill n = [0 .. n - 1]
+
+printDevices :: IO ()
+printDevices = mapM_ (print . snd) =<< listDevices
+
+openInputStream :: PM.DeviceID -> IO PM.PMStream
+openInputStream input = do
+  inputStream <- PM.openInput input
+
+  case inputStream of
+    (Right is) -> pure is
+    _          -> ioError $ userError "Could not open midi input stream:"
+
+openOutputStream :: PM.DeviceID -> IO PM.PMStream
+openOutputStream output = do
+  outputStream <- PM.openOutput 0 output
+
+  case outputStream of
+    (Right os) -> pure os
+    _          -> ioError $ userError "Could not open midi ouput stream:"
+
+pickDevices :: IO (PM.DeviceID, PM.DeviceID)
+pickDevices = do
+  devices <- listDevices
+  let inputDevices  = filter (PM.input  . snd) devices
+      outputDevices = filter (PM.output . snd) devices
+      inputIds      = map fst inputDevices
+      outputIds     = map fst outputDevices
+
+  putStrLn ""
+  putStrLn "Pick an input device:"
+  printDevs inputDevices
+
+  selectedInput <- readLn :: IO PM.DeviceID
+  if selectedInput `elem` inputIds
+    then pure ()
+    else ioError $ userError $ show selectedInput <> "is not a valid device"
+
+  putStrLn ""
+  putStrLn "Pick an output device:"
+  printDevs outputDevices
+
+  selectedOutput <- readLn :: IO PM.DeviceID
+  if selectedOutput `elem` outputIds
+    then pure (selectedInput, selectedOutput)
+    else ioError $ userError $ show selectedInput <> "is not a valid device"
+
+ where
+  printDevs ds = sequence_
+    [ putStrLn $ "  " <> show num <> ") " <> PM.name device
+    | (num, device) <- ds
+    ]
+
+
+
+---------- Specialized device picking functions for my setup ------------------
+--
+getDevice :: (PM.DeviceInfo -> Bool) -> IO PM.DeviceID
+getDevice selector =
+  fromIntegral . fst . head . filter (selector . snd) <$> listDevices
+
+
+getInputDevice :: IO PM.DeviceID
+getInputDevice = getDevice $ \d -> take 5 (PM.name d) == "CASIO" && PM.input d
+
+getOutputDevice :: IO PM.DeviceID
+getOutputDevice = getDevice $ \d -> (PM.name d == "VirMIDI 0-1") && PM.input d

@@ -85,10 +85,21 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   --   <$> eHeld
 
 
-setup :: IO ()
-setup = withPM $ do
-  inputStream               <- openInputStream
-  outputStream              <- openOutputStream
+-- Pick input and output devices and start network
+frpMain :: IO ()
+frpMain = withPM $ uncurry startNetwork =<< pickDevices
+
+-- Starts the network with my input and output devices
+frpMain' :: IO ()
+frpMain' = withPM $ do
+  input  <- getInputDevice
+  output <- getOutputDevice
+  startNetwork input output
+
+startNetwork :: PM.DeviceID -> PM.DeviceID -> IO ()
+startNetwork input output = do
+  inputStream               <- openInputStream  input
+  outputStream              <- openOutputStream output
   (addMidiEvent, fireMidi)  <- newAddHandler
   (addTickEvent, tick, tid) <- makeTick
 
