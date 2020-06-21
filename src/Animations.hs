@@ -22,9 +22,6 @@ import Data.Maybe
 import           Reactive.Banana
 import           Reactive.Banana.Frameworks
 
--- TODO use Durations instead of DeltaTimes!
-
--- type DeltaTime         = Integer
 type Duration = Integer
 type Frame a  = (Duration, a)
 
@@ -38,9 +35,6 @@ unAnimation (Animation xs) = xs
 
 instance Semigroup (Animation a) where
   (Animation as) <> (Animation bs) = Animation $ as <> bs
-  -- (Animation as) <> (Animation ((t, fb) : bs)) =
-  --   Animation $ as <> ((t + 1, fb) : bs)
-  -- a <> (Animation []) = a
 
 instance Monoid (Animation a) where
   mempty = Animation []
@@ -50,7 +44,6 @@ pauseAnim d = Animation [pauseFrame d]
 
 pauseFrame :: Empty a => Duration -> Frame a
 pauseFrame d = (d, emptyElem)
-
 
 cycleAnimationPause :: Empty a => Duration -> Animation a -> Animation a
 cycleAnimationPause pt anim =
@@ -69,6 +62,12 @@ newtype AbsAnimation a = AbsAnimation [AbsFrame a]
 unAbsAnimation :: AbsAnimation a -> [AbsFrame a]
 unAbsAnimation (AbsAnimation xs) = xs
 
+toAbsAnimation :: Animation a -> AbsAnimation a
+toAbsAnimation (Animation xs) = AbsAnimation $ zip absoluteTimes frames
+ where
+  (times, frames) = unzip xs
+  absoluteTimes   = scanl (+) 0 times
+
 -- | Advances the animation by one step if the correct point in time has been
 -- reached, and returns (currentFrame, rest). If the correct point in time
 -- has not been reached, returns (Nothing, rest)
@@ -84,9 +83,3 @@ makeFrameEvent :: Event TimeStamp -> AbsAnimation a -> MomentIO (Event a)
 makeFrameEvent eCounter anim = do
   eAnimation <- accumE (Nothing, anim) $ (. snd) . stepAnim <$> eCounter
   pure $ fromJust . fst <$> filterE (isJust . fst) eAnimation
-
-toAbsAnimation :: Animation a -> AbsAnimation a
-toAbsAnimation (Animation xs) = AbsAnimation $ zip absoluteTimes frames
- where
-  (times, frames) = unzip xs
-  absoluteTimes   = scanl (+) 0 times
