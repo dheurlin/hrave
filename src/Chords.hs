@@ -3,6 +3,7 @@ module Chords where
 import           DataTypes
 import           Notes
 import           Midi
+import           Util                           ( (//) )
 
 import           Foreign.C.Types                ( CLong )
 import           Data.List
@@ -23,10 +24,9 @@ data Chord = Chord { rootNote :: Note, chordQuality :: ChordQuality }
 
 type NoteInterval = CLong
 
--- TODO shift the octave of root so that it is below other notes
 toChord :: [Note] -> Maybe Chord
 toChord [] = Nothing
-toChord ns = Just $ Chord root quality
+toChord ns = Just $ Chord shiftedRoot quality
  where
   inversions =
     [ (n, toQuality $ sort $ map ((`mod` 12) . subtract n) ns) | n <- ns ]
@@ -36,6 +36,10 @@ toChord ns = Just $ Chord root quality
   firstJust (x           : xs) = firstJust xs
 
   (root, quality) = fromMaybe (minimum ns, UnknownChord) (firstJust inversions)
+
+  -- shifts the octave of root so that it is below all other notes
+  shiftedRoot =
+    octShift root $ (-1) * fromIntegral (fromIntegral root - minimum ns) // 12
 
 toQuality :: [NoteInterval] -> Maybe ChordQuality
 toQuality = toQuality' . rmFifth . nub
