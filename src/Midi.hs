@@ -12,8 +12,6 @@ import           Control.Event.Handler
 
 import           Data.Maybe
 import           Control.Monad
-import           Control.Monad.Trans
-import           Control.Monad.Trans.Except
 import           Control.Concurrent             ( threadDelay )
 import           Foreign.C.Types                ( CLong )
 import           System.IO.Error
@@ -64,21 +62,7 @@ showEvent (PM.PMMsg status data1 data2)
     = "Noteon: " <> maybe "" show (midiToPianoNote $ fromIntegral data1) <> "\n"
   | otherwise = ""
 
-readDevice :: PM.PMStream -> PM.PMStream -> ExceptT PM.PMError IO ()
-readDevice input output = do
-
-  forever $ do
-    msgs <- ExceptT (PM.readEvents input)
-
-    liftIO $ mapM_ printMessage msgs
-    liftIO $ PM.writeEvents output $ filter isNoteOn msgs
-    -- liftIO . mapM_ printMessage =<< ExceptT (PM.readEvents stream)
-    liftIO $ threadDelay 500
-
-  void $ liftIO $ PM.close input
-
- where
-  printMessage = putStr . showEvent . PM.decodeMsg . PM.message
+--------------- MIDI I/O ------------------------------------------------------
 
 readStream :: PM.PMStream -> IO [MidiMessage]
 readStream stream = do
@@ -95,7 +79,7 @@ writeStream stream msgs =
     Right _ -> pure ()
     Left  _ -> ioError $ userError "Could not write MIDI stream"
 
------- Printing and choosing input and output ---------------------------------
+------ Printing and choosing devices ------------------------------------------
 
 listDevices :: IO [(Int, PM.DeviceInfo)]
 listDevices =
