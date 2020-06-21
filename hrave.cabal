@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a314ccc3c09a76876ecdd09f5aff22d90facb92fb44c323f763e940ecc4a82e5
+-- hash: 1db90a27a1ef6ebeb5ed4815fc92d189343700b5090fff2e79b5afb167363c8e
 
 name:           hrave
 version:        0.1.0.0
@@ -27,6 +27,8 @@ source-repository head
 library
   exposed-modules:
       Animations
+      BeatLib.DrumMap
+      BeatLib.Samba
       Beats
       Chords
       Config

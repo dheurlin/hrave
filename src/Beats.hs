@@ -149,35 +149,6 @@ beat = cycleAnimation $ Animation
   , pauseFrame 4
   ]
 
-testBassSeq :: Sequence [RelNote]
-testBassSeq = Sequence
-  [ mkNote [RelNote IRoot  (-1)] $ DDotted DEighth
-  , mkNote [RelNote IFifth (-1)]   DSixteenth
-  , mkNote [RelNote IFifth (-1)] $ DDotted DEighth
-  , mkNote [RelNote IRoot  (-1)]   DSixteenth
-  ]
-
-testBass = cycleAnimation $ compileSequence testBassSeq
-
-
-testSequence :: Sequence ()
-testSequence = Sequence
-  [ mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DEighth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  ]
 
 printAnim :: Show a => Int -> Animation a -> IO ()
 printAnim n (Animation as) = mapM_ print $ take n as
@@ -185,8 +156,6 @@ printAnim n (Animation as) = mapM_ print $ take n as
 sumDurations :: Animation a -> Integer
 sumDurations (Animation as) = sum . map fst $ as
 
-testBeat :: Animation BeatUnit
-testBeat = cycleAnimation $ compileSequence testSequence
 
 -- 42 F#1 Closed Hi Hat
 

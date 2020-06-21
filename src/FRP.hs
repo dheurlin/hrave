@@ -12,6 +12,8 @@ import           Animations
 import           Beats
 import           Chords
 
+import qualified BeatLib.Samba as Samba
+
 import           Foreign.C.Types                ( CLong )
 
 import           Control.Monad
@@ -39,6 +41,9 @@ import qualified Sound.PortMidi                as PM
 
 -- TODO let this be changed dynamically
 bpm = 100
+chordChannel = 0
+bassChannel  = 1
+drumChannel  = 9
 
 
 makeNetworkDescription
@@ -48,31 +53,28 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   -- By having an Integer counter, we should never get an overflow
   eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1)
 
+  -- held   <- accumB [] $ updateHeldMany <$> eMidi
   eMidi         <- fromAddHandler addMidiEvent          -- stream of midi events
   eHeldAndChord <- accumE ([], Nothing) $ updateHeldChordMany <$> eMidi
-  -- held   <- accumB [] $ updateHeldMany <$> eMidi -- currently held notes
-  held   <- stepper [] $ fst <$> eHeldAndChord
+
+  held   <- stepper [] $ fst <$> eHeldAndChord -- currently held notes
   chord  <- stepper (Chord 49 MajorChord) $ filterJust $ snd <$> eHeldAndChord
 
-  eBeat     <- makeFrameEvent eCtr (toAbsAnimation testBeat)
-  eTickFun  <- makeFrameEvent eCtr (toAbsAnimation beatAnim)
-  eBass     <- makeFrameEvent eCtr (toAbsAnimation testBass)
+  eChordAnim <- makeFrameEvent eCtr (toAbsAnimation Samba.chords)
+  eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
 
-  let eChordBeat = beatToMidi 0 <$> held <@> eBeat
-  let eClick     = beatToMidi 9 [42] <$> eBeat
-  let eTickBeat = map (\f -> f 9 100) <$> eTickFun
-  let eBassEvents = (\chord fun -> fun chord 1) <$> chord <@> eBass
+  let eChord = beatToMidi chordChannel <$> held                <@> eChordAnim
+  let eBass  = (\chord fun -> fun chord bassChannel) <$> chord <@> eBassAnim
+  -- let eClick     = beatToMidi drumChannel [42] <$> eBeat
 
-  eChord <- changes chord
-  eHeld <- changes held
+  eHeldChord <- changes chord
+  eHeld      <- changes held
 
-  reactimate' $ fmap print <$> eChord
+  reactimate' $ fmap print <$> eHeldChord
   reactimate' $ fmap print <$> eHeld
 
-  reactimate $ writeStream outputStream <$> eChordBeat
-  reactimate $ writeStream outputStream <$> eBassEvents
-  -- reactimate $ writeStream outputStream <$> eTickBeat
-  -- reactimate $ writeStream outputStream <$> eClick
+  reactimate $ writeStream outputStream <$> eChord
+  reactimate $ writeStream outputStream <$> eBass
 
 
 
