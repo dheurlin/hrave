@@ -1,5 +1,3 @@
-{-# LANGUAGE BlockArguments #-}
-
 module Main where
 
 import           FRP                            ( frpMain )

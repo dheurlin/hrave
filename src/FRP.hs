@@ -114,13 +114,13 @@ startNetwork input output = do
     )
     Nothing
 
-  forever
-    (  (readStream inputStream >>= \case
-         [] -> pure ()
-         xs -> fireMidi xs
-       )
-    >> threadDelay 500
-    )
+  -- Poll MIDI input and activate MIDI event on change
+  forever $ do
+    readStream inputStream >>= \case
+      [] -> pure ()
+      xs -> fireMidi xs
+    threadDelay 500
+
   putStrLn "Exited"
 
 
@@ -130,7 +130,6 @@ makeTick = do
 
   tid <- forkIO . forever $ do
     threadDelay (tickPeriod bpm)
-    -- threadDelay 100_000
     tick ()
 
   pure (addTickEvent, tick, tid)
