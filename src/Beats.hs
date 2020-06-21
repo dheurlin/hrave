@@ -39,7 +39,7 @@ instance BeatRep () where
 -- TODO should also take velocity as argument
 beatToMidi :: MidiChannel -> [Note] -> BeatUnit -> [MidiMessage]
 beatToMidi channel ns BeatOn =
-  [ MidiMessage channel $ NoteOn note 100 | note <- ns ]
+  [ MidiMessage channel $ NoteOn note 70 | note <- ns ]
 beatToMidi channel ns BeatOff = noteOffAll channel
   -- [ MidiMessage channel $ NoteOff note 100 | note <- [0 .. 127] ]
 beatToMidi channel ns BeatEmpty = []
@@ -139,15 +139,6 @@ compileSequence
   => Sequence a
   -> Animation b
 compileSequence (Sequence notes) = mconcat $ map compileNote notes
-
-
-beat :: Animation BeatUnit
-beat = cycleAnimation $ Animation
-  [ (3, BeatOn) , (1, BeatOff)
-  , (3, BeatOn) , (1, BeatOff)
-  , (3, BeatOn) , (1, BeatOff)
-  , pauseFrame 4
-  ]
 
 
 printAnim :: Show a => Int -> Animation a -> IO ()
