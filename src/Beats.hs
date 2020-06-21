@@ -6,34 +6,16 @@ module Beats where
 import Config
 import DataTypes
 import Animations
+import Chords
+import Notes
 
 import           Foreign.C.Types                ( CLong )
 
-
-
-data BeatUnit = BeatOn | BeatOff | BeatEmpty
-  deriving ( Show )
-
-instance Empty BeatUnit where
-  emptyElem = BeatEmpty
-
--- TODO should also take velocity as argument
-beatToMidi :: CLong -> [Note] -> BeatUnit -> [MidiMessage]
-beatToMidi channel ns BeatOn =
-  [ MidiMessage channel $ NoteOn note 100 | note <- ns ]
-beatToMidi channel ns BeatOff =
-  [ MidiMessage channel $ NoteOff note 100 | note <- [0 .. 127] ]
-beatToMidi channel ns BeatEmpty = []
 
 class BeatRep b where
   type BeatContents b :: *
   beatOn              :: b -> BeatContents b
   beatOff             :: b -> BeatContents b
-
-instance BeatRep () where
-  type BeatContents () = BeatUnit
-  beatOff              = const BeatOff
-  beatOn               = const BeatOn
 
 instance BeatRep [Note] where
   type BeatContents [Note] = [MidiFunc]
@@ -41,8 +23,55 @@ instance BeatRep [Note] where
   beatOn                   = map noteOffMsg
 
 
+-- | A datatype reprenting a unit of a beat with no pitch information
+data BeatUnit = BeatOn | BeatOff | BeatEmpty
+  deriving ( Show )
+
+instance Empty BeatUnit where
+  emptyElem = BeatEmpty
+
+instance BeatRep () where
+  type BeatContents () = BeatUnit
+  beatOff              = const BeatOff
+  beatOn               = const BeatOn
+
+
+-- TODO should also take velocity as argument
+beatToMidi :: MidiChannel -> [Note] -> BeatUnit -> [MidiMessage]
+beatToMidi channel ns BeatOn =
+  [ MidiMessage channel $ NoteOn note 100 | note <- ns ]
+beatToMidi channel ns BeatOff = noteOffAll channel
+  -- [ MidiMessage channel $ NoteOff note 100 | note <- [0 .. 127] ]
+beatToMidi channel ns BeatEmpty = []
+
+
+noteOffAll :: MidiChannel -> [ MidiMessage ]
+noteOffAll c = [ MidiMessage c $ NoteOff note 100 | note <- [0 .. 127] ]
+
+data ChordRole = IRoot
+               | IFifth
+  deriving ( Eq, Show )
+
+data RelNote = RelNote { rRole     :: ChordRole
+                       , rOctShift :: Int
+                       }
+
+relToNote :: Chord -> RelNote -> Note
+relToNote chord n@(RelNote _ oct) = octShift (relToNote' chord n) oct
+  where
+    relToNote' (Chord root _) (RelNote IRoot  _) = root
+    relToNote' (Chord root _) (RelNote IFifth _) = root + 7
+
+instance BeatRep [RelNote] where
+  type BeatContents [RelNote] = Chord -> MidiChannel -> [MidiMessage]
+  beatOff ns chord = noteOffAll
+  beatOn ns chord channel = -- TODO add velocity as argument
+    [ noteOnMsg n channel 100 | n <- map (relToNote chord) ns ]
+
+instance Empty (Chord -> MidiChannel -> [MidiMessage]) where
+  emptyElem = const . const []
+
 -- TODO should be able to program parts and fuse them into single animation
---
 data NoteRole a = NNote a | NPause
   deriving ( Eq, Show )
 
@@ -119,6 +148,16 @@ beat = cycleAnimation $ Animation
   , (3, BeatOn) , (1, BeatOff)
   , pauseFrame 4
   ]
+
+testBassSeq :: Sequence [RelNote]
+testBassSeq = Sequence
+  [ mkNote [RelNote IRoot  (-1)] $ DDotted DEighth
+  , mkNote [RelNote IFifth (-1)]   DSixteenth
+  , mkNote [RelNote IFifth (-1)] $ DDotted DEighth
+  , mkNote [RelNote IRoot  (-1)]   DSixteenth
+  ]
+
+testBass = cycleAnimation $ compileSequence testBassSeq
 
 
 testSequence :: Sequence ()

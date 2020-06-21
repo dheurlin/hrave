@@ -55,3 +55,12 @@ pn = pn'
 
   e n = error $ "Invalid note name: " <> n
 
+
+octShift :: Note -> Int -> Note
+octShift n s = octShift' where
+
+  octShift' | s > 0, shifted <= 127 = shifted
+            | s < 0, shifted >= 0   = shifted
+            | otherwise             = n
+
+  shifted = n + (12 * fromIntegral s)

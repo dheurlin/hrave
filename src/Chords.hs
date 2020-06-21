@@ -23,6 +23,7 @@ data Chord = Chord { rootNote :: Note, chordQuality :: ChordQuality }
 
 type NoteInterval = CLong
 
+-- TODO shift the octave of root so that it is below other notes
 toChord :: [Note] -> Maybe Chord
 toChord [] = Nothing
 toChord ns = Just $ Chord root quality
@@ -56,17 +57,6 @@ testMajor =
   , pianoNoteToMidi $ pn "F#2"
   ]
 
--- TODO updateHeldChord still seems problematic, as it often changes a major
--- chord to a minor chord or vice versa when keys are released.
---
--- Possible solutions:
--- 1. Add a delay for noteOff events so that events that happen in quick
---    succession will be registered at same time
--- 2. Don't allow change of chord quality without first lifting all notes
---
--- I think I prefer 2. since it's easier to implement and might not affect
--- convenience that much
-
 -- | Updates the record of which notes are held and what chord was last played
 updateHeldChord :: MidiMessage -> ([Note], Maybe Chord) -> ([Note], Maybe Chord)
 updateHeldChord msgs (heldOld, chordOld) = (heldNew, chordNew)
@@ -74,18 +64,8 @@ updateHeldChord msgs (heldOld, chordOld) = (heldNew, chordNew)
     heldNew = updateHeld msgs heldOld
     chordNew
       | length heldNew >= length heldOld = toChord heldNew
-      | Just c <- toChord heldNew,
-        chordQuality c /= UnknownChord   = Just c
       | otherwise                        = chordOld
 
 updateHeldChordMany
   :: [MidiMessage] -> ([Note], Maybe Chord) -> ([Note], Maybe Chord)
 updateHeldChordMany = flip $ foldl (flip updateHeldChord)
-
--- updateHeld :: MidiMessage -> [Note] -> [Note]
--- updateHeld (MidiMessage _ (NoteOn n _))  held = n : held
--- updateHeld (MidiMessage _ (NoteOff n _)) held = filter (/= n) held
--- updateHeld _ held = held
-
--- updateHeldMany :: [MidiMessage] -> [Note] -> [Note]
--- updateHeldMany = flip $ foldl (flip updateHeld)

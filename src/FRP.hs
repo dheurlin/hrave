@@ -56,10 +56,12 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
 
   eBeat     <- makeFrameEvent eCtr (toAbsAnimation testBeat)
   eTickFun  <- makeFrameEvent eCtr (toAbsAnimation beatAnim)
+  eBass     <- makeFrameEvent eCtr (toAbsAnimation testBass)
 
   let eChordBeat = beatToMidi 0 <$> held <@> eBeat
   let eClick     = beatToMidi 9 [42] <$> eBeat
   let eTickBeat = map (\f -> f 9 100) <$> eTickFun
+  let eBassEvents = (\chord fun -> fun chord 1) <$> chord <@> eBass
 
   eChord <- changes chord
   eHeld <- changes held
@@ -67,7 +69,8 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   reactimate' $ fmap print <$> eChord
   reactimate' $ fmap print <$> eHeld
 
-  -- reactimate $ writeStream outputStream <$> eChordBeat
+  reactimate $ writeStream outputStream <$> eChordBeat
+  reactimate $ writeStream outputStream <$> eBassEvents
   -- reactimate $ writeStream outputStream <$> eTickBeat
   -- reactimate $ writeStream outputStream <$> eClick
 
