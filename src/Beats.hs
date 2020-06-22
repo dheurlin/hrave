@@ -11,6 +11,10 @@ import Notes
 
 import           Foreign.C.Types                ( CLong )
 
+type MidiMsgFunc = MidiChannel -> Velocity -> [MidiMessage]
+
+instance Empty MidiMsgFunc where
+  emptyElem = const . const []
 
 class BeatRep b where
   type BeatContents b :: *
@@ -18,11 +22,12 @@ class BeatRep b where
   beatOff             :: b -> BeatContents b
 
 instance BeatRep [Note] where
-  type BeatContents [Note] = [MidiFunc]
-  beatOff                  = map noteOnMsg
-  beatOn                   = map noteOffMsg
+  type BeatContents [Note] = MidiMsgFunc
+  beatOff ns channel v     = noteOffAll channel
+  beatOn  ns channel v     = [ noteOnMsg n channel v | n <- ns ]
 
 
+-- TODO can we shallow embed this, like with [Note] and [RelNote] ?
 -- | A datatype reprenting a unit of a beat with no pitch information
 data BeatUnit = BeatOn | BeatOff | BeatEmpty
   deriving ( Show )
@@ -48,10 +53,15 @@ beatToMidi channel ns BeatEmpty = []
 noteOffAll :: MidiChannel -> [ MidiMessage ]
 noteOffAll c = [ MidiMessage c $ NoteOff note 100 | note <- [0 .. 127] ]
 
+
+-- | A dataype representing the role of a note within a chord, i.e. root,
+-- fifth, third etc.
 data ChordRole = IRoot
                | IFifth
   deriving ( Eq, Show )
 
+-- | A 'ChordRole' together with an octave shift, so we can e.g. go down
+-- to the fifth below the root instead of up
 data RelNote = RelNote { rRole     :: ChordRole
                        , rOctShift :: Int
                        }
@@ -63,13 +73,13 @@ relToNote chord n@(RelNote _ oct) = octShift (relToNote' chord n) oct
     relToNote' (Chord root _) (RelNote IFifth _) = root + 7
 
 instance BeatRep [RelNote] where
-  type BeatContents [RelNote] = Chord -> MidiChannel -> [MidiMessage]
-  beatOff ns chord = noteOffAll
-  beatOn ns chord channel = -- TODO add velocity as argument
-    [ noteOnMsg n channel 100 | n <- map (relToNote chord) ns ]
+  type BeatContents [RelNote] = Chord -> MidiMsgFunc
+  beatOff _ _ channel vel = noteOffAll channel
+  beatOn ns chord channel vel =
+    [ noteOnMsg n channel vel | n <- map (relToNote chord) ns ]
 
-instance Empty (Chord -> MidiChannel -> [MidiMessage]) where
-  emptyElem = const . const []
+instance Empty (Chord -> MidiMsgFunc) where
+  emptyElem = const emptyElem
 
 -- TODO should be able to program parts and fuse them into single animation
 data NoteRole a = NNote a | NPause
@@ -153,5 +163,5 @@ sumDurations (Animation as) = sum . map fst $ as
 tickSeq :: Sequence [Note]
 tickSeq = Sequence [ mkNote [42] DQuarter ]
 
-beatAnim :: Animation [MidiFunc]
+beatAnim :: Animation MidiMsgFunc
 beatAnim = cycleAnimation $ compileSequence tickSeq

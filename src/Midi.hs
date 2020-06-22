@@ -67,11 +67,9 @@ showEvent (PM.PMMsg status data1 data2)
 readStream :: PM.PMStream -> IO [MidiMessage]
 readStream stream = do
   res  <- PM.readEvents stream
-  msgs <- case res of
+  case res of
     Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
     _        -> ioError $ userError "Could not read MIDI stream"
-  threadDelay 500
-  pure msgs
 
 writeStream :: PM.PMStream -> [MidiMessage] -> IO ()
 writeStream stream msgs =
@@ -137,10 +135,8 @@ pickDevices = do
     | (num, device) <- ds
     ]
 
-
-
 ---------- Specialized device picking functions for my setup ------------------
---
+
 getDevice :: (PM.DeviceInfo -> Bool) -> IO PM.DeviceID
 getDevice selector =
   fromIntegral . fst . head . filter (selector . snd) <$> listDevices

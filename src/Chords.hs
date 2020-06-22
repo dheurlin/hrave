@@ -41,6 +41,8 @@ toChord ns = Just $ Chord shiftedRoot quality
   shiftedRoot =
     octShift root $ (-1) * fromIntegral (fromIntegral root - minimum ns) // 12
 
+-- TODO ambiguous chords: (bring back fifth and see if that resolves it?)
+-- Min7 vs 6
 toQuality :: [NoteInterval] -> Maybe ChordQuality
 toQuality = toQuality' . rmFifth . nub
  where
@@ -52,7 +54,6 @@ toQuality = toQuality' . rmFifth . nub
   toQuality' _          = Nothing
 
   rmFifth = filter (/= 7)
-  -- elmems needles haystack = all (`elem` haystack) needles
 
 testMajor :: [Note]
 testMajor =

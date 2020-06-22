@@ -39,11 +39,14 @@ import           Reactive.Banana.Frameworks
 import qualified Sound.PortMidi                as PM
 
 
--- TODO let this be changed dynamically
-bpm = 100
-chordChannel = 0
-bassChannel  = 1
-drumChannel  = 9
+-- TODO let these be changed dynamically
+bpm           = 100
+chordChannel  = 0
+chordVelocity = 100
+bassChannel   = 1
+bassVelocity  = 100
+drumChannel   = 9
+drumVelocity  = 100
 
 
 makeNetworkDescription
@@ -64,9 +67,9 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
-  let eChord = beatToMidi chordChannel <$> held                <@> eChordAnim
-  let eBass  = (\chord fun -> fun chord bassChannel) <$> chord <@> eBassAnim
-  let eDrums = map (\f -> f drumChannel 100)                   <$> eDrumAnim
+  let eChord = beatToMidi chordChannel                <$> held  <@> eChordAnim
+  let eBass  = (\c f -> f c bassChannel bassVelocity) <$> chord <@> eBassAnim
+  let eDrums = (\f -> f drumChannel drumVelocity)               <$> eDrumAnim
 
   eHeldChord <- changes chord
   eHeld      <- changes held
