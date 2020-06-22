@@ -57,7 +57,7 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eTick <- fromAddHandler addTickEvent
   eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1) -- Should never overflow :)
 
-  eMidi         <- fromAddHandler addMidiEvent -- stream of midi events
+  eMidi <- fromAddHandler addMidiEvent -- stream of midi events
   let (eLower, eUpper) = splitTup (splitMidi splitPoint <$> eMidi)
 
   eHeldAndChord <- accumE ([], Nothing) $ updateHeldChordMany <$> eLower
@@ -79,9 +79,12 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   reactimate' $ fmap print <$> eHeldChord
   reactimate' $ fmap print <$> eHeld
 
-  reactimate $ writeStream outputStream <$> eChord
-  reactimate $ writeStream outputStream <$> eBass
-  reactimate $ writeStream outputStream <$> eDrums
+  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eUpper]
+  reactimate $ writeStream outputStream <$> eOut
+
+  -- reactimate $ writeStream outputStream <$> eChord
+  -- reactimate $ writeStream outputStream <$> eBass
+  -- reactimate $ writeStream outputStream <$> eDrums
   -- reactimate $ writeStream outputStream <$> eLower -- Just echo notes
 
 

@@ -18,7 +18,7 @@ writeStream :: PM.PMStream -> [MidiMessage] -> IO ()
 writeStream stream msgs =
   (PM.writeEvents stream =<< toEvents msgs) >>= \case
     Right _ -> pure ()
-    Left  _ -> ioError $ userError "Could not write MIDI stream"
+    Left  e -> ioError $ userError $ "Could not write MIDI stream: " <> show e
 
 ------ Printing and choosing devices ------------------------------------------
 
