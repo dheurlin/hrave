@@ -72,13 +72,15 @@ relToNote chord n@(RelNote _ oct) = octShift (relToNote' chord n) oct
     relToNote' (Chord root _) (RelNote IRoot  _) = root
     relToNote' (Chord root _) (RelNote IFifth _) = root + 7
 
+type ChordFunc = Chord -> MidiMsgFunc
+
 instance BeatRep [RelNote] where
-  type BeatContents [RelNote] = Chord -> MidiMsgFunc
+  type BeatContents [RelNote] = ChordFunc
   beatOff _ _ channel vel = noteOffAll channel
   beatOn ns chord channel vel =
     [ noteOnMsg n channel vel | n <- map (relToNote chord) ns ]
 
-instance Empty (Chord -> MidiMsgFunc) where
+instance Empty ChordFunc where
   emptyElem = const emptyElem
 
 -- TODO should be able to program parts and fuse them into single animation

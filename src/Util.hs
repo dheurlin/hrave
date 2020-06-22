@@ -1,8 +1,15 @@
 module Util where
 
-import           Control.Monad                  ( void )
 import           System.IO.Error
+
+import           Control.Monad                  ( void )
+import           Data.Function                  ( (&) )
+
 import qualified Sound.PortMidi                as PM
+import           Reactive.Banana                ( Event
+                                                , Behavior
+                                                , (<@>)
+                                                )
 
 
 withPM :: IO () -> IO ()
@@ -14,3 +21,10 @@ withPM io =
 -- | Integer division which rounds up
 (//) :: Integral a => a -> a -> a
 a // b = (a + b - 1) `div` b;
+
+
+(<~>) :: Event (a -> b) -> Behavior a -> Event b
+e <~> b = (&) <$> b <@> e
+
+infixl 4 <~>
+

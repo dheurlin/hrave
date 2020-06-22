@@ -19,7 +19,10 @@ import           Foreign.C.Types                ( CLong )
 import           Control.Monad
 import           Data.Maybe
 import           Data.Either
-import           Data.Functor                   ( ($>) )
+import           Data.Functor                   ( ($>)
+                                                , (<&>)
+                                                )
+import           Control.Arrow                  ( (>>>) )
 
 import qualified System.Posix.Signals as SIG    ( installHandler
                                                 , Handler(..)
@@ -48,7 +51,6 @@ bassVelocity  = 100
 drumChannel   = 9
 drumVelocity  = 100
 
-
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
 makeNetworkDescription addTickEvent addMidiEvent outputStream = do
@@ -67,9 +69,9 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
-  let eChord = beatToMidi chordChannel                <$> held  <@> eChordAnim
-  let eBass  = (\c f -> f c bassChannel bassVelocity) <$> chord <@> eBassAnim
-  let eDrums = (\f -> f drumChannel drumVelocity)               <$> eDrumAnim
+  let eChord = beatToMidi chordChannel <$> held <@> eChordAnim
+  let eBass  = eBassAnim <~> chord <&> ($ bassChannel) <&> ($ bassVelocity)
+  let eDrums = eDrumAnim           <&> ($ drumChannel) <&> ($ drumVelocity)
 
   eHeldChord <- changes chord
   eHeld      <- changes held
