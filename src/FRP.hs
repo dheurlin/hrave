@@ -69,9 +69,9 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
-  let eChord = beatToMidi chordChannel <$> held <@> eChordAnim
-  let eBass  = eBassAnim <~> chord <&> ($ bassChannel) <&> ($ bassVelocity)
-  let eDrums = eDrumAnim           <&> ($ drumChannel) <&> ($ drumVelocity)
+  let eChord = eChordAnim <~> held  <&> ($ chordChannel) <&> ($ chordVelocity)
+  let eBass  = eBassAnim  <~> chord <&> ($ bassChannel)  <&> ($ bassVelocity)
+  let eDrums = eDrumAnim            <&> ($ drumChannel)  <&> ($ drumVelocity)
 
   eHeldChord <- changes chord
   eHeld      <- changes held

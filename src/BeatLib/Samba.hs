@@ -16,26 +16,26 @@ bassSeq = Sequence
 
 bass = cycleAnimation $ compileSequence bassSeq
 
-chordSeq :: Sequence ()
+chordSeq :: Sequence ChordBeat
 chordSeq = Sequence
-  [ mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DEighth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
-  , mkNote () DSixteenth
-  , mkPause   DSixteenth
+  [ mkNote CBeat DSixteenth
+  , mkPause      DSixteenth
+  , mkNote CBeat DSixteenth
+  , mkPause      DEighth
+  , mkNote CBeat DSixteenth
+  , mkPause      DSixteenth
+  , mkNote CBeat DSixteenth
+  , mkPause      DSixteenth
+  , mkNote CBeat DSixteenth
+  , mkPause      DSixteenth
+  , mkNote CBeat DSixteenth
+  , mkNote CBeat DSixteenth
+  , mkPause      DSixteenth
+  , mkNote CBeat DSixteenth
+  , mkPause      DSixteenth
   ]
 
-chords :: Animation BeatUnit
+chords :: Animation HeldNoteFun
 chords = cycleAnimation $ compileSequence chordSeq
 
 maracasSeq :: Sequence [Note]

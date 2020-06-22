@@ -11,6 +11,8 @@ import Notes
 
 import           Foreign.C.Types                ( CLong )
 
+------- Data Types for representing units of a beat ---------------------------
+
 type MidiMsgFunc = MidiChannel -> Velocity -> [MidiMessage]
 
 instance Empty MidiMsgFunc where
@@ -27,27 +29,19 @@ instance BeatRep [Note] where
   beatOn  ns channel v     = [ noteOnMsg n channel v | n <- ns ]
 
 
--- TODO can we shallow embed this, like with [Note] and [RelNote] ?
--- | A datatype reprenting a unit of a beat with no pitch information
-data BeatUnit = BeatOn | BeatOff | BeatEmpty
-  deriving ( Show )
+-- | A datatype for a beat that does not have any pitch information of its own,
+-- meaning it only specifies the rhythm and applies the currently held notes
+data ChordBeat = CBeat
 
-instance Empty BeatUnit where
-  emptyElem = BeatEmpty
+type HeldNoteFun = [Note] -> MidiMsgFunc
 
-instance BeatRep () where
-  type BeatContents () = BeatUnit
-  beatOff              = const BeatOff
-  beatOn               = const BeatOn
+instance BeatRep ChordBeat where
+  type BeatContents ChordBeat = HeldNoteFun
+  beatOff _ ns channel v = noteOffAll channel
+  beatOn  _ ns channel v = [ noteOnMsg n channel v | n <- ns]
 
-
--- TODO should also take velocity as argument
-beatToMidi :: MidiChannel -> [Note] -> BeatUnit -> [MidiMessage]
-beatToMidi channel ns BeatOn =
-  [ MidiMessage channel $ NoteOn note 70 | note <- ns ]
-beatToMidi channel ns BeatOff = noteOffAll channel
-  -- [ MidiMessage channel $ NoteOff note 100 | note <- [0 .. 127] ]
-beatToMidi channel ns BeatEmpty = []
+instance Empty HeldNoteFun where
+  emptyElem = const emptyElem
 
 
 noteOffAll :: MidiChannel -> [ MidiMessage ]
@@ -83,6 +77,8 @@ instance BeatRep [RelNote] where
 instance Empty ChordFunc where
   emptyElem = const emptyElem
 
+--------------- Data Types for representing rhythm of a beat ------------------
+
 -- TODO should be able to program parts and fuse them into single animation
 data NoteRole a = NNote a | NPause
   deriving ( Eq, Show )
@@ -113,6 +109,7 @@ mkPause d = BNote d NPause
 mkTuple :: [NoteRole a] -> NoteDuration -> BNote a
 mkTuple ns d = BTuple d ns
 
+------------------- Compiling a beat sequence to an animation -----------------
 
 -- This assumes every subdivision can be converted to a whole number of
 -- ticks, maybe change to a rational number and round when compiling to animation?
@@ -151,19 +148,3 @@ compileSequence
   => Sequence a
   -> Animation b
 compileSequence (Sequence notes) = mconcat $ map compileNote notes
-
-
-printAnim :: Show a => Int -> Animation a -> IO ()
-printAnim n (Animation as) = mapM_ print $ take n as
-
-sumDurations :: Animation a -> Integer
-sumDurations (Animation as) = sum . map fst $ as
-
-
--- 42 F#1 Closed Hi Hat
-
-tickSeq :: Sequence [Note]
-tickSeq = Sequence [ mkNote [42] DQuarter ]
-
-beatAnim :: Animation MidiMsgFunc
-beatAnim = cycleAnimation $ compileSequence tickSeq

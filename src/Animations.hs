@@ -52,6 +52,12 @@ cycleAnimationPause pt anim =
 cycleAnimation :: Animation a -> Animation a
 cycleAnimation (Animation as) = Animation $ cycle as
 
+printAnim :: Show a => Int -> Animation a -> IO ()
+printAnim n (Animation as) = mapM_ print $ take n as
+
+sumDurations :: Animation a -> Integer
+sumDurations (Animation as) = sum . map fst $ as
+
 type TimeStamp         = Integer
 type AbsFrame a        = (TimeStamp, a)
 
