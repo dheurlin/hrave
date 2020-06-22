@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1db90a27a1ef6ebeb5ed4815fc92d189343700b5090fff2e79b5afb167363c8e
+-- hash: 693ec551d9e5808d42a82db4e5100459a06017130cfb98c67427d9d731e9afff
 
 name:           hrave
 version:        0.1.0.0
@@ -36,6 +36,7 @@ library
       FRP
       Lib
       Midi
+      MidiIO
       Notes
       Util
   other-modules:
@@ -45,11 +46,7 @@ library
   build-depends:
       PortMidi
     , base >=4.7 && <5
-    , midi
-    , mtl
-    , random
     , reactive-banana
-    , transformers
     , unix
   default-language: Haskell2010
 
@@ -59,16 +56,12 @@ executable hrave-exe
       Paths_hrave
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -W
   build-depends:
       PortMidi
     , base >=4.7 && <5
     , hrave
-    , midi
-    , mtl
-    , random
     , reactive-banana
-    , transformers
     , unix
   default-language: Haskell2010
 
@@ -84,10 +77,6 @@ test-suite hrave-test
       PortMidi
     , base >=4.7 && <5
     , hrave
-    , midi
-    , mtl
-    , random
     , reactive-banana
-    , transformers
     , unix
   default-language: Haskell2010

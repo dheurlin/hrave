@@ -8,8 +8,7 @@ import DataTypes
 import Animations
 import Chords
 import Notes
-
-import           Foreign.C.Types                ( CLong )
+import Midi
 
 ------- Data Types for representing units of a beat ---------------------------
 
@@ -25,8 +24,8 @@ class BeatRep b where
 
 instance BeatRep [Note] where
   type BeatContents [Note] = MidiMsgFunc
-  beatOff ns channel v     = noteOffAll channel
-  beatOn  ns channel v     = [ noteOnMsg n channel v | n <- ns ]
+  beatOff _ channel _ = noteOffAll channel
+  beatOn ns channel v = [ noteOnMsg n channel v | n <- ns ]
 
 
 -- | A datatype for a beat that does not have any pitch information of its own,
@@ -37,15 +36,11 @@ type HeldNoteFun = [Note] -> MidiMsgFunc
 
 instance BeatRep ChordBeat where
   type BeatContents ChordBeat = HeldNoteFun
-  beatOff _ ns channel v = noteOffAll channel
+  beatOff _ _ channel _  = noteOffAll channel
   beatOn  _ ns channel v = [ noteOnMsg n channel v | n <- ns]
 
 instance Empty HeldNoteFun where
   emptyElem = const emptyElem
-
-
-noteOffAll :: MidiChannel -> [ MidiMessage ]
-noteOffAll c = [ MidiMessage c $ NoteOff note 100 | note <- [0 .. 127] ]
 
 
 -- | A dataype representing the role of a note within a chord, i.e. root,
@@ -70,7 +65,7 @@ type ChordFunc = Chord -> MidiMsgFunc
 
 instance BeatRep [RelNote] where
   type BeatContents [RelNote] = ChordFunc
-  beatOff _ _ channel vel = noteOffAll channel
+  beatOff _ _ channel _ = noteOffAll channel
   beatOn ns chord channel vel =
     [ noteOnMsg n channel vel | n <- map (relToNote chord) ns ]
 

@@ -6,23 +6,17 @@ module FRP where
 import           Config
 import           Util
 import           Midi
-import           Notes
+import           MidiIO
 import           DataTypes
 import           Animations
-import           Beats
 import           Chords
 
 import qualified BeatLib.Samba as Samba
 
-import           Foreign.C.Types                ( CLong )
-
 import           Control.Monad
-import           Data.Maybe
-import           Data.Either
 import           Data.Functor                   ( ($>)
                                                 , (<&>)
                                                 )
-import           Control.Arrow                  ( (>>>) )
 
 import qualified System.Posix.Signals as SIG    ( installHandler
                                                 , Handler(..)
@@ -54,12 +48,11 @@ drumVelocity  = 100
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
 makeNetworkDescription addTickEvent addMidiEvent outputStream = do
-  eTick <- fromAddHandler addTickEvent
-  -- By having an Integer counter, we should never get an overflow
-  eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1)
 
-  -- held   <- accumB [] $ updateHeldMany <$> eMidi
-  eMidi         <- fromAddHandler addMidiEvent          -- stream of midi events
+  eTick <- fromAddHandler addTickEvent
+  eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1) -- Should never overflow :)
+
+  eMidi         <- fromAddHandler addMidiEvent -- stream of midi events
   eHeldAndChord <- accumE ([], Nothing) $ updateHeldChordMany <$> eMidi
 
   held   <- stepper [] $ fst <$> eHeldAndChord -- currently held notes
@@ -82,13 +75,6 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   reactimate $ writeStream outputStream <$> eChord
   reactimate $ writeStream outputStream <$> eBass
   reactimate $ writeStream outputStream <$> eDrums
-
-
-
-  -- reactimate
-  --   $ (putStrLn <$> ("Held notes: " <>) . show . mapMaybe midiToPianoNote)
-  --   <$> eHeld
-
 
 -- Pick input and output devices and start network
 frpMain :: IO ()

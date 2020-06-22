@@ -7,6 +7,24 @@ import Data.Maybe
 import Data.Char
 import Text.Read
 
+type Octave = Int
+
+data NoteName = A | B | C | D | E | F | G
+  deriving ( Eq, Show, Enum, Read )
+
+data NoteMod = NoteNormal | NoteSharp
+  deriving ( Eq )
+
+instance Show NoteMod where
+  show NoteNormal = ""
+  show NoteSharp  = "#"
+
+data PianoNote = PianoNote NoteName NoteMod Octave
+  deriving ( Eq )
+
+instance Show PianoNote where
+  show (PianoNote name mod oct) = show name <> show mod <> show oct
+
 pianoNotes :: [PianoNote]
 pianoNotes =
   concat
