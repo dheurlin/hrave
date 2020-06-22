@@ -99,7 +99,7 @@ openInputStream input = do
 
 openOutputStream :: PM.DeviceID -> IO PM.PMStream
 openOutputStream output = do
-  outputStream <- PM.openOutput 0 output
+  outputStream <- PM.openOutput 3 output
 
   case outputStream of
     (Right os) -> pure os
