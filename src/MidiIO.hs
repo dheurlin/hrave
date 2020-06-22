@@ -2,13 +2,10 @@
 
 module MidiIO where
 
-import           DataTypes
 import           Midi
 
 import           Data.Maybe
-
 import qualified Sound.PortMidi                as PM
-import           System.IO.Error
 
 readStream :: PM.PMStream -> IO [MidiMessage]
 readStream stream = do
@@ -43,7 +40,7 @@ openInputStream input = do
 
 openOutputStream :: PM.DeviceID -> IO PM.PMStream
 openOutputStream output = do
-  outputStream <- PM.openOutput output 2
+  outputStream <- PM.openOutput output 3
 
   case outputStream of
     (Right os) -> pure os
@@ -91,6 +88,7 @@ getInputDevice :: IO PM.DeviceID
 getInputDevice = getDevice $ \d -> take 5 (PM.name d) == "CASIO" && PM.input d
 
 getOutputDevice :: IO PM.DeviceID
-getOutputDevice = getDevice $ \d -> (PM.name d == "VirMIDI 0-1") && PM.input d
+-- getOutputDevice = getDevice $ \d -> (PM.name d == "VirMIDI 0-1") && PM.input d
+getOutputDevice = getDevice $ \d -> (PM.name d == "Midi Through Port-0") && PM.input d
 
 

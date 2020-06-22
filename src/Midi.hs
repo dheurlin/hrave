@@ -6,6 +6,8 @@ module Midi where
 import           DataTypes
 
 import           Data.Bits
+import           Data.List
+
 import qualified Sound.PortMidi                as PM
 
 data MsgType = NoteOn  Note Velocity
@@ -28,6 +30,14 @@ noteOffAll c = [ MidiMessage c $ NoteOff note 100 | note <- [0 .. 127] ]
 isNoteOn :: PM.PMEvent -> Bool
 isNoteOn (PM.PMEvent msg _) = status .&. 0xF0 == 0b1001_0000
   where (PM.PMMsg status _ _) = PM.decodeMsg msg
+
+-- | Splits messages into those that are below and above the given threshold
+splitMidi :: Note -> [MidiMessage] -> ([MidiMessage], [MidiMessage])
+splitMidi t = partition isBelow
+  where
+    isBelow (MidiMessage _ (NoteOn  n _)) = n < t
+    isBelow (MidiMessage _ (NoteOff n _)) = n < t
+    -- TODO Where to put other message types?
 
 fromMessage :: MidiMessage -> PM.PMMsg
 fromMessage (MidiMessage channel (NoteOff note velocity))

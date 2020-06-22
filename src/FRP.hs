@@ -38,12 +38,17 @@ import qualified Sound.PortMidi                as PM
 
 -- TODO let these be changed dynamically
 bpm           = 100
+
 chordChannel  = 0
 chordVelocity = 100
+
 bassChannel   = 1
 bassVelocity  = 100
+
 drumChannel   = 9
 drumVelocity  = 100
+
+splitPoint = 60
 
 makeNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
@@ -53,7 +58,9 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1) -- Should never overflow :)
 
   eMidi         <- fromAddHandler addMidiEvent -- stream of midi events
-  eHeldAndChord <- accumE ([], Nothing) $ updateHeldChordMany <$> eMidi
+  let (eLower, eUpper) = splitTup (splitMidi splitPoint <$> eMidi)
+
+  eHeldAndChord <- accumE ([], Nothing) $ updateHeldChordMany <$> eLower
 
   held   <- stepper [] $ fst <$> eHeldAndChord -- currently held notes
   chord  <- stepper (Chord 49 MajorChord) $ filterJust $ snd <$> eHeldAndChord
@@ -63,8 +70,8 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
   let eChord = eChordAnim <~> held  <&> ($ chordChannel) <&> ($ chordVelocity)
-  let eBass  = eBassAnim  <~> chord <&> ($ bassChannel)  <&> ($ bassVelocity)
-  let eDrums = eDrumAnim            <&> ($ drumChannel)  <&> ($ drumVelocity)
+      eBass  = eBassAnim  <~> chord <&> ($ bassChannel)  <&> ($ bassVelocity)
+      eDrums = eDrumAnim            <&> ($ drumChannel)  <&> ($ drumVelocity)
 
   eHeldChord <- changes chord
   eHeld      <- changes held
@@ -75,6 +82,9 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   reactimate $ writeStream outputStream <$> eChord
   reactimate $ writeStream outputStream <$> eBass
   reactimate $ writeStream outputStream <$> eDrums
+  -- reactimate $ writeStream outputStream <$> eLower -- Just echo notes
+
+
 
 -- Pick input and output devices and start network
 frpMain :: IO ()
@@ -110,7 +120,7 @@ startNetwork input output = do
     readStream inputStream >>= \case
       [] -> pure ()
       xs -> fireMidi xs
-    threadDelay 500
+    threadDelay 1_000
 
   putStrLn "Exited"
 

@@ -20,7 +20,7 @@ withPM io =
 
 -- | Integer division which rounds up
 (//) :: Integral a => a -> a -> a
-a // b = (a + b - 1) `div` b;
+a // b = (a + b - 1) `div` b
 
 
 (<~>) :: Event (a -> b) -> Behavior a -> Event b
@@ -28,3 +28,5 @@ e <~> b = (&) <$> b <@> e
 
 infixl 4 <~>
 
+splitTup :: Event (a, b) -> (Event a, Event b)
+splitTup eTup = (fst <$> eTup, snd <$> eTup)
