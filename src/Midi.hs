@@ -12,6 +12,7 @@ import qualified Sound.PortMidi                as PM
 
 data MsgType = NoteOn  Note Velocity
              | NoteOff Note Velocity
+             | AllNotesOff
   deriving (Show)
 
 data MidiMessage = MidiMessage { msgChannel :: MidiChannel
@@ -25,7 +26,8 @@ noteOffMsg :: Note -> MidiChannel -> Velocity -> MidiMessage
 noteOffMsg n c _ = MidiMessage c $ NoteOff n 0
 
 noteOffAll :: MidiChannel -> [ MidiMessage ]
-noteOffAll c = [ MidiMessage c $ NoteOff note 100 | note <- [0 .. 127] ]
+noteOffAll c = [ MidiMessage c AllNotesOff ]
+-- noteOffAll c = [ MidiMessage c $ NoteOff note 100 | note <- [0 .. 127] ]
 
 isNoteOn :: PM.PMEvent -> Bool
 isNoteOn (PM.PMEvent msg _) = status .&. 0xF0 == 0b1001_0000
@@ -37,6 +39,7 @@ splitMidi t = partition isBelow
   where
     isBelow (MidiMessage _ (NoteOn  n _)) = n < t
     isBelow (MidiMessage _ (NoteOff n _)) = n < t
+    isBelow _ = True
     -- TODO Where to put other message types?
 
 fromMessage :: MidiMessage -> PM.PMMsg
@@ -44,6 +47,8 @@ fromMessage (MidiMessage channel (NoteOff note velocity))
   = PM.PMMsg (0b1000_0000 .|. channel) note velocity
 fromMessage (MidiMessage channel (NoteOn note velocity))
   = PM.PMMsg (0b1001_0000 .|. channel) note velocity
+fromMessage (MidiMessage channel AllNotesOff)
+  = PM.PMMsg (0b1011_0000 .|. channel) 123 0
 
 toMessage :: PM.PMMsg -> Maybe MidiMessage
 toMessage (PM.PMMsg status data1 data2)
