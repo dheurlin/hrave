@@ -89,6 +89,6 @@ getInputDevice = getDevice $ \d -> take 5 (PM.name d) == "CASIO" && PM.input d
 
 getOutputDevice :: IO PM.DeviceID
 -- getOutputDevice = getDevice $ \d -> (PM.name d == "VirMIDI 0-1") && PM.input d
-getOutputDevice = getDevice $ \d -> (PM.name d == "Midi Through Port-0") && PM.input d
+getOutputDevice = getDevice $ \d -> (PM.name d == "Midi Through Port-0") && PM.output d
 
 

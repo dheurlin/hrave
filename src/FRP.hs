@@ -115,12 +115,17 @@ startNetwork input output = do
     (makeNetworkDescription addTickEvent addMidiEvent outputStream)
   actuate network
 
-  -- Close stream and kill tick thread on interrupt
-  SIG.installHandler
-    SIG.sigINT
-    (SIG.Catch $ PM.close inputStream >> PM.close outputStream >> killThread tid
-    )
-    Nothing
+  -- Close stream,  kill tick thread, and mute all notes on interrupt
+  SIG.installHandler SIG.sigINT (SIG.Catch $ do
+      pause network
+      threadDelay 100_000
+      writeStream outputStream [MidiMessage c AllNotesOff | c <- [0..15]]
+      threadDelay 1000_000
+      PM.close inputStream
+      PM.close outputStream
+      killThread tid
+      putStrLn "Exited"
+    ) Nothing
 
   -- Poll MIDI input and activate MIDI event on change
   forever $ do
@@ -129,10 +134,8 @@ startNetwork input output = do
       xs -> fireMidi xs
     threadDelay 1_000
 
-  putStrLn "Exited"
 
-
-makeTick :: IO (AddHandler (), Handler () ,ThreadId)
+makeTick :: IO (AddHandler (), Handler (), ThreadId)
 makeTick = do
   (addTickEvent, tick) <- newAddHandler
 
