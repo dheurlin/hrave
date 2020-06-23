@@ -14,6 +14,7 @@ import           Notes
 
 import qualified BeatLib.Samba as Samba
 
+import           Data.Maybe
 import           Control.Monad
 import           Data.Functor                   ( ($>)
                                                 , (<&>)
@@ -77,6 +78,11 @@ mkNetworkDescription addTickEvent addMidiEvent outputStream = do
   eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
+  melNote <- fmap listToMaybe <$> accumE [] (updateHeldMany <$> eUpper)
+  let eMelChord     = moveBelowMby <$> melNote <~> held
+  let eMelChordMidi = maybe (noteOffAll melodyChannel)
+                         (map (\n -> noteOnMsg n melodyChannel 100)) <$> eMelChord
+
   let eDrums = eDrumAnim           <&> ($ drumChannel)  <&> ($ drumVelocity)
 
       eChord = eChordAnim <~> held <&> ($ chordRange)
@@ -97,7 +103,7 @@ mkNetworkDescription addTickEvent addMidiEvent outputStream = do
   reactimate' $ fmap print <$> eHeldChord
   reactimate' $ fmap print <$> eHeld
 
-  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eMel]
+  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eMel, eMelChordMidi]
   reactimate $ writeStream outputStream <$> eOut
 
 

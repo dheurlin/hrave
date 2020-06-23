@@ -94,6 +94,17 @@ octShiftAbove = octShiftTill 1
 octShiftTill :: Int -> Note -> Note -> Note
 octShiftTill sgn target n = octShift (fromIntegral sgn * (target - n) // 12) n
 
+-- | Places a note so that it is below the target tone, as close as possible
+moveBelow :: Note -> Note -> Note
+moveBelow target n
+  | n > target = octShiftBelow target n
+  | n < target = octShift ((target - n) `div` 12) n
+  | otherwise  = n
+
+moveBelowMby :: Maybe Note -> [Note] -> Maybe [Note]
+moveBelowMby (Just target) n = Just $ map (moveBelow target) n
+moveBelowMby _             _ = Nothing
+
 type NoteRange = (Maybe Note, Maybe Note)
 
 fullRange :: NoteRange
