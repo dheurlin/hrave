@@ -42,6 +42,9 @@ splitMidi t = partition isBelow
     isBelow _ = True
     -- TODO Where to put other message types?
 
+changeChannel :: MidiChannel -> MidiMessage -> MidiMessage
+changeChannel newChan (MidiMessage c m) = MidiMessage newChan m
+
 fromMessage :: MidiMessage -> PM.PMMsg
 fromMessage (MidiMessage channel (NoteOff note velocity))
   = PM.PMMsg (0b1000_0000 .|. channel) note velocity
