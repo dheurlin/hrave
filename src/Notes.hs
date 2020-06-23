@@ -1,6 +1,7 @@
 module Notes where
 
 import DataTypes
+import Util
 
 import Data.List
 import Data.Maybe
@@ -73,12 +74,31 @@ pn = pn'
 
   e n = error $ "Invalid note name: " <> n
 
-
-octShift :: Note -> Int -> Note
-octShift n s = octShift' where
+octShift :: OctShift -> Note -> Note
+octShift s n = octShift' where
 
   octShift' | s > 0, shifted <= 127 = shifted
             | s < 0, shifted >= 0   = shifted
             | otherwise             = n
 
-  shifted = n + (12 * fromIntegral s)
+  shifted = n + (12 * s)
+
+-- | Octave shifts a note so that it is below the target note
+octShiftBelow :: Note -> Note -> Note
+octShiftBelow target n = octShift ((-1) * (target - n) // 12) n
+
+-- | Octave shifts a note so that it is above the target note
+octShiftAbove :: Note -> Note -> Note
+octShiftAbove target n = octShift ((n - target) // 12) n
+
+type NoteRange = (Maybe Note, Maybe Note)
+
+fullRange :: NoteRange
+fullRange = (Nothing, Nothing)
+
+-- | Octave shifts a note so that it is within the specified range
+shiftToRange :: NoteRange -> Note -> Note
+shiftToRange (low, high) n
+  | Just lowLim  <- low , n < lowLim  = octShiftAbove lowLim  n
+  | Just highLim <- high, n > highLim = octShiftBelow highLim n
+  | otherwise                         = n

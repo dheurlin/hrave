@@ -3,7 +3,6 @@ module Chords where
 import           DataTypes
 import           Notes
 import           Midi
-import           Util                           ( (//) )
 
 import           Foreign.C.Types                ( CLong )
 import           Data.List
@@ -32,14 +31,13 @@ toChord ns = Just $ Chord shiftedRoot quality
     [ (n, toQuality $ sort $ map ((`mod` 12) . subtract n) ns) | n <- ns ]
 
   firstJust []                 = Nothing
-  firstJust ((n, Just q) : xs) = Just (n, q)
-  firstJust (x           : xs) = firstJust xs
+  firstJust ((n, Just q) : _ ) = Just (n, q)
+  firstJust (_           : xs) = firstJust xs
 
   (root, quality) = fromMaybe (minimum ns, UnknownChord) (firstJust inversions)
 
   -- shifts the octave of root so that it is below all other notes
-  shiftedRoot =
-    octShift root $ (-1) * fromIntegral (fromIntegral root - minimum ns) // 12
+  shiftedRoot = octShiftBelow (minimum ns) root
 
 -- TODO ambiguous chords: (bring back fifth and see if that resolves it?)
 -- Min7 vs 6

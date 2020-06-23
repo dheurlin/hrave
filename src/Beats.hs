@@ -32,15 +32,16 @@ instance BeatRep [Note] where
 -- meaning it only specifies the rhythm and applies the currently held notes
 data ChordBeat = CBeat
 
-type HeldNoteFun = [Note] -> MidiMsgFunc
+type HeldNoteFun = [Note] -> NoteRange -> OctShift -> MidiMsgFunc
 
 instance BeatRep ChordBeat where
   type BeatContents ChordBeat = HeldNoteFun
-  beatOff _ _ channel _  = noteOffAll channel
-  beatOn  _ ns channel v = [ noteOnMsg n channel v | n <- ns]
+  beatOff _ _ _ _     channel _  = noteOffAll channel
+  beatOn _ ns rng sft channel v  =
+    [ noteOnMsg (shiftToRange rng $ octShift sft n) channel v | n <- ns ]
 
 instance Empty HeldNoteFun where
-  emptyElem = const emptyElem
+  emptyElem = const . const .const emptyElem
 
 
 -- | A dataype representing the role of a note within a chord, i.e. root,
@@ -52,25 +53,38 @@ data ChordRole = IRoot
 -- | A 'ChordRole' together with an octave shift, so we can e.g. go down
 -- to the fifth below the root instead of up
 data RelNote = RelNote { rRole     :: ChordRole
-                       , rOctShift :: Int
+                       , rOctShift :: OctShift
                        }
 
 relToNote :: Chord -> RelNote -> Note
-relToNote chord n@(RelNote _ oct) = octShift (relToNote' chord n) oct
+relToNote chord n@(RelNote _ oct) = octShift oct $ relToNote' chord n
   where
     relToNote' (Chord root _) (RelNote IRoot  _) = root
     relToNote' (Chord root _) (RelNote IFifth _) = root + 7
 
-type ChordFunc = Chord -> MidiMsgFunc
+type ChordFunc = Chord -> NoteRange -> OctShift -> MidiMsgFunc
 
 instance BeatRep [RelNote] where
   type BeatContents [RelNote] = ChordFunc
-  beatOff _ _ channel _ = noteOffAll channel
-  beatOn ns chord channel vel =
-    [ noteOnMsg n channel vel | n <- map (relToNote chord) ns ]
+  beatOff _ _ _ _ channel _ = noteOffAll channel
+  beatOn ns chord rng sft channel vel =
+    [ noteOnMsg (shiftToRange rng $ octShift sft n) channel vel
+    | n <- map (relToNote chord) ns
+    ]
 
 instance Empty ChordFunc where
-  emptyElem = const emptyElem
+  emptyElem = const . const . const emptyElem
+
+-- type HeldNoteFun = [Note] -> NoteRange -> OctShift -> MidiMsgFunc
+
+-- instance BeatRep ChordBeat where
+--   type BeatContents ChordBeat = HeldNoteFun
+--   beatOff _ _ _ _     channel _  = noteOffAll channel
+--   beatOn _ ns rng sft channel v  =
+--     [ noteOnMsg (shiftToRange rng $ octShift sft n) channel v | n <- ns ]
+
+-- instance Empty HeldNoteFun where
+--   emptyElem = const . const .const emptyElem
 
 --------------- Data Types for representing rhythm of a beat ------------------
 

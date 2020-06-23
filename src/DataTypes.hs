@@ -15,4 +15,6 @@ instance Empty [a] where
 type Note        = CLong
 type MidiChannel = CLong
 type Velocity    = CLong
+type OctShift    = CLong
+
 

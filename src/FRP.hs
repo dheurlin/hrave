@@ -10,6 +10,7 @@ import           MidiIO
 import           DataTypes
 import           Animations
 import           Chords
+import           Notes
 
 import qualified BeatLib.Samba as Samba
 
@@ -41,20 +42,25 @@ bpm           = 115
 
 chordChannel  = 0
 chordVelocity = 100
+chordOctShift = 1
+chordRange    = fullRange
 
 bassChannel   = 1
 bassVelocity  = 100
+bassOctShift  = 0
+bassRange     = fullRange
 
 drumChannel   = 9
 drumVelocity  = 100
 
-melodyChannel = 2
+melodyChannel  = 2
+melodyOctShift = 0
 
 splitPoint = 60
 
-makeNetworkDescription
+mkNetworkDescription
   :: AddHandler () -> AddHandler [MidiMessage] -> PM.PMStream -> MomentIO ()
-makeNetworkDescription addTickEvent addMidiEvent outputStream = do
+mkNetworkDescription addTickEvent addMidiEvent outputStream = do
 
   eTick <- fromAddHandler addTickEvent
   eCtr  <- accumE (-1 :: Tick) $ eTick $> (+ 1) -- Should never overflow :)
@@ -71,9 +77,17 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
   eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
-  let eChord = eChordAnim <~> held  <&> ($ chordChannel) <&> ($ chordVelocity)
-      eBass  = eBassAnim  <~> chord <&> ($ bassChannel)  <&> ($ bassVelocity)
-      eDrums = eDrumAnim            <&> ($ drumChannel)  <&> ($ drumVelocity)
+  let eDrums = eDrumAnim           <&> ($ drumChannel)  <&> ($ drumVelocity)
+
+      eChord = eChordAnim <~> held <&> ($ chordRange)
+                                   <&> ($ chordOctShift)
+                                   <&> ($ chordChannel)
+                                   <&> ($ chordVelocity)
+
+      eBass  = eBassAnim  <~> chord <&> ($ bassRange)
+                                    <&> ($ bassOctShift)
+                                    <&> ($ bassChannel)
+                                    <&> ($ bassVelocity)
 
       eMel   = map (changeChannel melodyChannel) <$> eUpper
 
@@ -85,12 +99,6 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
 
   let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eMel]
   reactimate $ writeStream outputStream <$> eOut
-
-  -- reactimate $ writeStream outputStream <$> eChord
-  -- reactimate $ writeStream outputStream <$> eBass
-  -- reactimate $ writeStream outputStream <$> eDrums
-  -- reactimate $ writeStream outputStream <$> eLower -- Just echo notes
-
 
 
 -- Pick input and output devices and start network
@@ -106,36 +114,35 @@ frpMain' = withPM $ do
 
 startNetwork :: PM.DeviceID -> PM.DeviceID -> IO ()
 startNetwork input output = do
-  inputStream               <- openInputStream  input
-  outputStream              <- openOutputStream output
-  (addMidiEvent, fireMidi)  <- newAddHandler
-  (addTickEvent, tick, tid) <- makeTick
+  inputStr                 <- openInputStream input
+  outputStr                <- openOutputStream output
+  (addMidiEvent, fireMidi) <- newAddHandler
+  (addTickEvent, tid     ) <- makeTick
 
-  network                   <- compile
-    (makeNetworkDescription addTickEvent addMidiEvent outputStream)
+  network <- compile (mkNetworkDescription addTickEvent addMidiEvent outputStr)
   actuate network
 
   -- Close stream,  kill tick thread, and mute all notes on interrupt
   SIG.installHandler SIG.sigINT (SIG.Catch $ do
       pause network
       threadDelay 100_000
-      writeStream outputStream [MidiMessage c AllNotesOff | c <- [0..15]]
+      writeStream outputStr [MidiMessage c AllNotesOff | c <- [0..15]]
       threadDelay 1000_000
-      PM.close inputStream
-      PM.close outputStream
+      PM.close inputStr
+      PM.close outputStr
       killThread tid
       putStrLn "Exited"
     ) Nothing
 
   -- Poll MIDI input and activate MIDI event on change
   forever $ do
-    readStream inputStream >>= \case
+    readStream inputStr >>= \case
       [] -> pure ()
       xs -> fireMidi xs
     threadDelay 1_000
 
 
-makeTick :: IO (AddHandler (), Handler (), ThreadId)
+makeTick :: IO (AddHandler (), ThreadId)
 makeTick = do
   (addTickEvent, tick) <- newAddHandler
 
@@ -143,7 +150,7 @@ makeTick = do
     threadDelay (tickPeriod bpm)
     tick ()
 
-  pure (addTickEvent, tick, tid)
+  pure (addTickEvent, tid)
 
 -- makeTickEvent
 --   :: Int -- Initial delay
