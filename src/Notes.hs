@@ -85,11 +85,14 @@ octShift s n = octShift' where
 
 -- | Octave shifts a note so that it is below the target note
 octShiftBelow :: Note -> Note -> Note
-octShiftBelow target n = octShift ((-1) * (target - n) // 12) n
+octShiftBelow = octShiftTill (-1)
 
 -- | Octave shifts a note so that it is above the target note
 octShiftAbove :: Note -> Note -> Note
-octShiftAbove target n = octShift ((n - target) // 12) n
+octShiftAbove = octShiftTill 1
+
+octShiftTill :: Int -> Note -> Note -> Note
+octShiftTill sgn target n = octShift (fromIntegral sgn * (target - n) // 12) n
 
 type NoteRange = (Maybe Note, Maybe Note)
 

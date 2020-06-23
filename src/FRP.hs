@@ -43,12 +43,12 @@ bpm           = 115
 chordChannel  = 0
 chordVelocity = 100
 chordOctShift = 1
-chordRange    = fullRange
+chordRange    = (Just $ pianoNoteToMidi $ pn "F2", Nothing)
 
 bassChannel   = 1
 bassVelocity  = 100
 bassOctShift  = 0
-bassRange     = fullRange
+bassRange    = (Just $ pianoNoteToMidi $ pn "F0", Nothing)
 
 drumChannel   = 9
 drumVelocity  = 100
