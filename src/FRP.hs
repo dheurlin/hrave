@@ -37,7 +37,7 @@ import qualified Sound.PortMidi                as PM
 
 
 -- TODO let these be changed dynamically
-bpm           = 100
+bpm           = 115
 
 chordChannel  = 0
 chordVelocity = 100
@@ -47,6 +47,8 @@ bassVelocity  = 100
 
 drumChannel   = 9
 drumVelocity  = 100
+
+melodyChannel = 2
 
 splitPoint = 60
 
@@ -73,13 +75,15 @@ makeNetworkDescription addTickEvent addMidiEvent outputStream = do
       eBass  = eBassAnim  <~> chord <&> ($ bassChannel)  <&> ($ bassVelocity)
       eDrums = eDrumAnim            <&> ($ drumChannel)  <&> ($ drumVelocity)
 
+      eMel   = map (changeChannel melodyChannel) <$> eUpper
+
   eHeldChord <- changes chord
   eHeld      <- changes held
 
   reactimate' $ fmap print <$> eHeldChord
   reactimate' $ fmap print <$> eHeld
 
-  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eUpper]
+  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eMel]
   reactimate $ writeStream outputStream <$> eOut
 
   -- reactimate $ writeStream outputStream <$> eChord
