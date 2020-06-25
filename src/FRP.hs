@@ -14,6 +14,8 @@ import           Notes
 
 import qualified BeatLib.Samba as Samba
 
+import           Data.List
+import           Data.Ord                       (Down(..))
 import           Data.Maybe
 import           Control.Monad
 import           Data.Functor                   ( ($>)
@@ -42,9 +44,12 @@ import qualified Sound.PortMidi                as PM
 bpm           = 115
 
 chordChannel  = 0
-chordVelocity = 100
+chordVelocity = 80
 chordOctShift = 1
 chordRange    = (Just $ pianoNoteToMidi $ pn "F2", Nothing)
+
+chordMelodyChannel  = 3
+chordMelodyVelocity = 80
 
 bassChannel   = 1
 bassVelocity  = 100
@@ -78,10 +83,7 @@ mkNetworkDescription addTickEvent addMidiEvent outputStream = do
   eBassAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bass)
   eDrumAnim  <- makeFrameEvent eCtr (toAbsAnimation Samba.bongos)
 
-  melNote <- fmap listToMaybe <$> accumE [] (updateHeldMany <$> eUpper)
-  let eMelChord     = moveBelowMby <$> melNote <~> held
-  let eMelChordMidi = maybe (noteOffAll melodyChannel)
-                         (map (\n -> noteOnMsg n melodyChannel 100)) <$> eMelChord
+  eMelChord <- mkMelChordEvent eUpper (fst <$> eHeldAndChord) held
 
   let eDrums = eDrumAnim           <&> ($ drumChannel)  <&> ($ drumVelocity)
 
@@ -103,8 +105,36 @@ mkNetworkDescription addTickEvent addMidiEvent outputStream = do
   reactimate' $ fmap print <$> eHeldChord
   reactimate' $ fmap print <$> eHeld
 
-  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eMel, eMelChordMidi]
+  let eOut = foldl1 (unionWith (<>)) [eChord, eBass, eDrums, eMel, eMelChord]
   reactimate $ writeStream outputStream <$> eOut
+
+-- | Make an event which outputs MidiMessages for the held notes
+-- that follow the melody
+mkMelChordEvent
+  :: Event [MidiMessage] -- ^ Event of held notes in melody register
+  -> Event [Note]        -- ^ Event of currently held notes
+  -> Behavior [Note]     -- ^ Behavior of currently held notes
+  -> MomentIO (Event [MidiMessage])
+mkMelChordEvent eUpper eHeld held = do
+  eLenChanged <- accumE (False, 0) $ updateLen <$> (length <$> eHeld)
+  let eNoteLifted = filterE fst eLenChanged $> ()
+
+  eMelNote <- fmap (listToMaybe . sortDesc)
+    <$> accumE [] (updateHeldMany <$> eUpper)
+  let eMelChord = moveBelowMby <$> eMelNote <~> held
+  accumE [] $ unions
+    [ const (noteOffAll chordMelodyChannel) <$ eNoteLifted
+    , const . toMidiMsg <$> eMelChord
+    ]
+ where
+  updateLen :: Int -> (Bool, Int) -> (Bool, Int)
+  updateLen newLen (_, oldLen) = (newLen < oldLen, newLen)
+
+  toMidiMsg = maybe
+    (noteOffAll chordMelodyChannel)
+    (map (\n -> noteOnMsg n chordMelodyChannel chordMelodyVelocity))
+
+  sortDesc = sortOn Down
 
 
 -- Pick input and output devices and start network
