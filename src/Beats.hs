@@ -75,17 +75,6 @@ instance BeatRep [RelNote] where
 instance Empty ChordFunc where
   emptyElem = const . const . const emptyElem
 
--- type HeldNoteFun = [Note] -> NoteRange -> OctShift -> MidiMsgFunc
-
--- instance BeatRep ChordBeat where
---   type BeatContents ChordBeat = HeldNoteFun
---   beatOff _ _ _ _     channel _  = noteOffAll channel
---   beatOn _ ns rng sft channel v  =
---     [ noteOnMsg (shiftToRange rng $ octShift sft n) channel v | n <- ns ]
-
--- instance Empty HeldNoteFun where
---   emptyElem = const . const .const emptyElem
-
 --------------- Data Types for representing rhythm of a beat ------------------
 
 -- TODO should be able to program parts and fuse them into single animation

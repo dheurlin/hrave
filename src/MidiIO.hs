@@ -8,9 +8,8 @@ import           Data.Maybe
 import qualified Sound.PortMidi                as PM
 
 readStream :: PM.PMStream -> IO [MidiMessage]
-readStream stream = do
-  res  <- PM.readEvents stream
-  case res of
+readStream stream =
+  PM.readEvents stream >>= \case
     Right ms -> pure $ mapMaybe (toMessage . PM.decodeMsg . PM.message) ms
     _        -> ioError $ userError "Could not read MIDI stream"
 
@@ -31,18 +30,14 @@ printDevices :: IO ()
 printDevices = mapM_ (print . snd) =<< listDevices
 
 openInputStream :: PM.DeviceID -> IO PM.PMStream
-openInputStream input = do
-  inputStream <- PM.openInput input
-
-  case inputStream of
+openInputStream input =
+  PM.openInput input >>= \case
     (Right is) -> pure is
     _          -> ioError $ userError "Could not open midi input stream:"
 
 openOutputStream :: PM.DeviceID -> IO PM.PMStream
-openOutputStream output = do
-  outputStream <- PM.openOutput output 3
-
-  case outputStream of
+openOutputStream output =
+  PM.openOutput output 3 >>= \case
     (Right os) -> pure os
     _          -> ioError $ userError "Could not open midi ouput stream:"
 
@@ -88,7 +83,6 @@ getInputDevice :: IO PM.DeviceID
 getInputDevice = getDevice $ \d -> take 5 (PM.name d) == "CASIO" && PM.input d
 
 getOutputDevice :: IO PM.DeviceID
--- getOutputDevice = getDevice $ \d -> (PM.name d == "VirMIDI 0-1") && PM.input d
 getOutputDevice = getDevice $ \d -> (PM.name d == "Midi Through Port-0") && PM.output d
 
 
