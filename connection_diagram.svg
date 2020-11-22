@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="225.24066mm"
+   height="59.44529mm"
+   viewBox="0 0 225.24066 59.44529"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
+   sodipodi:docname="connection_diagram.svg">
+  <defs
+     id="defs2">
+    <rect
+       x="157.9778"
+       y="63.257195"
+       width="17.438999"
+       height="7.839427"
+       id="rect2104" />
+    <marker
+       style="overflow:visible"
+       id="marker2026"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend"
+       inkscape:isstock="true">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path2024" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker1900"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1898" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker1836"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path1834" />
+    </marker>
+    <rect
+       x="57.495998"
+       y="40.322746"
+       width="33.625225"
+       height="9.7617989"
+       id="rect1487" />
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend"
+       inkscape:isstock="true">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path994" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Mend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Mend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path976" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path970" />
+    </marker>
+    <rect
+       x="16.852545"
+       y="20.253235"
+       width="36.543644"
+       height="14.381336"
+       id="rect941" />
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mend-2"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Arrow2Mend"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         transform="scale(-0.6)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path994-9" />
+    </marker>
+    <rect
+       x="57.495998"
+       y="40.322746"
+       width="44.665367"
+       height="7.5868349"
+       id="rect3310" />
+    <rect
+       x="57.495998"
+       y="40.322746"
+       width="44.665367"
+       height="7.5868349"
+       id="rect3357" />
+    <rect
+       x="57.495998"
+       y="40.322746"
+       width="44.665367"
+       height="7.5868349"
+       id="rect3363" />
+    <rect
+       x="57.495998"
+       y="40.322746"
+       width="44.665367"
+       height="7.5868349"
+       id="rect3369" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7159063"
+     inkscape:cx="307.14431"
+     inkscape:cy="23.753533"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1064"
+     inkscape:window-x="0"
+     inkscape:window-y="16"
+     inkscape:window-maximized="1"
+     fit-margin-top="0.7"
+     lock-margins="true"
+     fit-margin-left="0.7"
+     fit-margin-right="0.7"
+     fit-margin-bottom="0.7" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-17.154774,-24.859799)">
+    <g
+       id="g1557">
+      <g
+         id="g937"
+         transform="translate(3.138056,22.531937)">
+        <rect
+           style="fill:none;fill-opacity:0.393514;fill-rule:evenodd;stroke:#000000;stroke-width:0.53166;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833"
+           width="8.8188934"
+           height="38.184723"
+           x="14.982548"
+           y="12.102633" />
+        <rect
+           style="fill:none;fill-opacity:0.393514;fill-rule:evenodd;stroke:#000000;stroke-width:0.53166;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833-3"
+           width="8.8188944"
+           height="38.184723"
+           x="23.801443"
+           y="12.102638" />
+        <rect
+           style="fill:none;fill-opacity:0.393514;fill-rule:evenodd;stroke:#000000;stroke-width:0.53166;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833-3-6"
+           width="8.8188953"
+           height="38.184723"
+           x="32.620338"
+           y="12.102642" />
+        <rect
+           style="fill:none;fill-opacity:0.393514;fill-rule:evenodd;stroke:#000000;stroke-width:0.53166;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833-3-6-7"
+           width="8.8188953"
+           height="38.184723"
+           x="41.439236"
+           y="12.102633" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.516697;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833-3-6-7-5"
+           width="6.0911684"
+           height="20.354187"
+           x="38.21759"
+           y="12.221036" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.516697;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833-3-6-7-5-3"
+           width="6.0911689"
+           height="20.354189"
+           x="29.657825"
+           y="12.069324" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.516697;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect833-3-6-7-5-3-5"
+           width="6.0911689"
+           height="20.354191"
+           x="20.712097"
+           y="12.069324" />
+      </g>
+      <text
+         xml:space="preserve"
+         id="text939"
+         style="font-style:normal;font-weight:normal;font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect941);fill:#000000;fill-opacity:1;stroke:none;"
+         transform="translate(2.1965759,4.5131023)"><tspan
+           x="16.853516"
+           y="24.702633"><tspan
+             style="shape-inside:url(#rect941)">MIDI controller</tspan></tspan></text>
+    </g>
+    <g
+       id="g3327">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:0.765;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Mend)"
+         d="M 56.680033,54.308515 H 90.653919"
+         id="path965"
+         sodipodi:nodetypes="cc" />
+      <text
+         xml:space="preserve"
+         id="text1485"
+         style="font-size:3.52778px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect1487);"
+         transform="translate(-0.68777967,16.183908)"><tspan
+           x="57.496094"
+           y="43.499929"><tspan>MIDI controller's </tspan></tspan><tspan
+           x="57.496094"
+           y="47.909654"><tspan>MIDI port</tspan></tspan></text>
+    </g>
+    <g
+       id="g1566">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.393161;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect1491"
+         width="38.391689"
+         height="19.113176"
+         x="93.816277"
+         y="44.741695" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+         x="105.92332"
+         y="55.99844"
+         id="text1561"><tspan
+           sodipodi:role="line"
+           id="tspan1559"
+           x="105.92332"
+           y="55.99844"
+           style="font-size:4.93889px;stroke-width:0.264583">HRave</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.765;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 133.69968,54.737216 h 15.59509"
+       id="path1686" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.765;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 149.2788,77.633901 V 31.104936"
+       id="path1686-6" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.921965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2Mend-2)"
+       d="m 149.2788,31.514259 h 50.22856"
+       id="path965-1"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.921965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1836)"
+       d="m 149.30246,43.122757 h 50.22848"
+       id="path1832"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.921965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker1900)"
+       d="m 149.30246,54.731256 h 50.22848"
+       id="path1896"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.921965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2026)"
+       d="m 149.30246,77.113399 h 50.22848"
+       id="path2022"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       id="text2102"
+       style="font-size:5.64444px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect2104);"
+       transform="matrix(0,2.5370614,-2.5370614,0,338.67764,-338.61185)"><tspan
+         x="157.97852"
+         y="68.342067"><tspan
+           style="shape-inside:url(#rect2104)">...</tspan></tspan></text>
+    <g
+       id="g2170"
+       transform="translate(16.404167)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect1491-7"
+         width="38.467194"
+         height="7.9411612"
+         x="186.69724"
+         y="27.127005" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+         x="195.10048"
+         y="32.797741"
+         id="text1561-0"><tspan
+           sodipodi:role="line"
+           id="tspan1559-9"
+           x="195.10048"
+           y="32.797741"
+           style="font-size:4.93889px;stroke-width:0.264583">MIDI Bass</tspan></text>
+    </g>
+    <g
+       id="g2197"
+       transform="translate(16.404167)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect2172"
+         width="38.467194"
+         height="7.9411612"
+         x="186.59106"
+         y="39.166889" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+         x="192.59962"
+         y="44.837624"
+         id="text2176"><tspan
+           sodipodi:role="line"
+           id="tspan2174"
+           x="192.59962"
+           y="44.837624"
+           style="font-size:4.93889px;stroke-width:0.264583">MIDI Drums</tspan></text>
+    </g>
+    <g
+       id="g2200"
+       transform="translate(16.404167)">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect2180"
+         width="38.467194"
+         height="7.9411612"
+         x="186.59106"
+         y="51.237473" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="209.40652"
+       y="56.384899"
+       id="text2184"><tspan
+         sodipodi:role="line"
+         id="tspan2182"
+         x="209.40652"
+         y="56.384899"
+         style="font-size:4.93889px;stroke-width:0.264583">MIDI Organ</tspan></text>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+       id="rect3276"
+       width="38.467194"
+       height="7.9411612"
+       x="202.99522"
+       y="73.078781" />
+    <text
+       xml:space="preserve"
+       style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="204.27832"
+       y="78.749519"
+       id="text3282"><tspan
+         sodipodi:role="line"
+         id="tspan3280"
+         x="204.27832"
+         y="78.749519"
+         style="font-size:4.93889px;stroke-width:0.264583">MIDI Instrument</tspan></text>
+    <text
+       xml:space="preserve"
+       id="text3308"
+       style="font-size:3.52778px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3310);"
+       transform="translate(93.961138,-15.240627)"><tspan
+         x="57.496094"
+         y="43.499929"><tspan>Virtual MIDI port channel 0</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text3355"
+       style="font-size:3.52778px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3357);"
+       transform="translate(93.961138,-4.1216097)"><tspan
+         x="57.496094"
+         y="43.499929"><tspan>Virtual MIDI port channel 1</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text3361"
+       style="font-size:3.52778px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3363);"
+       transform="translate(93.961138,7.5475489)"><tspan
+         x="57.496094"
+         y="43.499929"><tspan>Virtual MIDI port channel 2</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text3367"
+       style="font-size:3.52778px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3369);"
+       transform="translate(93.961138,39.293839)"><tspan
+         x="57.496094"
+         y="43.499929"><tspan>Virtual MIDI port channel n</tspan></tspan></text>
+  </g>
+</svg>
