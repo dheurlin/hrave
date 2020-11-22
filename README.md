@@ -12,6 +12,10 @@ your choice. It hence requires a virtual MIDI port to be present on the computer
 it is being run on, to which it can write MIDI messages and which your MIDI
 software instruments can listen to (more on this below).
 
+## Demo
+
+[![Demo](https://heurlin.xyz/files/hrave-preview/american.gif)](https://heurlin.xyz/files/hrave-preview/american.mp4)
+
 ## Features
 
 The following features are currently supported:
