@@ -95,7 +95,7 @@ outuput device. For the input device, select your MIDI controller. For the
 output device, select a virtual MIDI port (as described above). In your software
 instrument, you need to select the same virtual MIDI port as your input.
 
-This software listens for MIDI messages on channel 1 of the input device, and
+This software listens for MIDI messages on channel 0 of the input device, and
 outputs messages on multiple channels on the virtual MIDI port. Each output
 channel is used for one part of the music, e.g. percussion, bass, chords, melody
 and chord melody. Hence, you need to configure your software instrument so that

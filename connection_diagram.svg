@@ -7,13 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="225.24066mm"
-   height="59.44529mm"
-   viewBox="0 0 225.24066 59.44529"
+   width="234.24066mm"
+   height="68.44529mm"
+   viewBox="0 0 234.24066 68.445289"
    version="1.1"
    id="svg8"
-   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="connection_diagram.svg">
+   sodipodi:docname="connection_diagram.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
   <defs
      id="defs2">
     <rect
@@ -167,9 +167,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7159063"
-     inkscape:cx="307.14431"
-     inkscape:cy="23.753533"
+     inkscape:zoom="1.3551794"
+     inkscape:cx="743.61531"
+     inkscape:cy="57.76092"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -179,11 +179,11 @@
      inkscape:window-x="0"
      inkscape:window-y="16"
      inkscape:window-maximized="1"
-     fit-margin-top="0.7"
+     fit-margin-top="5.2"
      lock-margins="true"
-     fit-margin-left="0.7"
-     fit-margin-right="0.7"
-     fit-margin-bottom="0.7" />
+     fit-margin-left="5.2"
+     fit-margin-right="5.2"
+     fit-margin-bottom="5.2" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -200,7 +200,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-17.154774,-24.859799)">
+     transform="translate(-12.654774,-20.359799)">
     <g
        id="g1557">
       <g
@@ -340,89 +340,93 @@
          y="68.342067"><tspan
            style="shape-inside:url(#rect2104)">...</tspan></tspan></text>
     <g
-       id="g2170"
-       transform="translate(16.404167)">
+       id="g3924">
       <rect
-         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.264179;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
          id="rect1491-7"
-         width="38.467194"
-         height="7.9411612"
-         x="186.69724"
-         y="27.127005" />
+         width="41.727776"
+         height="7.9396129"
+         x="203.11565"
+         y="27.132257" />
       <text
          xml:space="preserve"
          style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-         x="195.10048"
+         x="213.25536"
          y="32.797741"
          id="text1561-0"><tspan
            sodipodi:role="line"
            id="tspan1559-9"
-           x="195.10048"
+           x="213.25536"
            y="32.797741"
            style="font-size:4.93889px;stroke-width:0.264583">MIDI Bass</tspan></text>
     </g>
     <g
-       id="g2197"
-       transform="translate(16.404167)">
+       id="g3919">
       <rect
-         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.264179;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
          id="rect2172"
-         width="38.467194"
-         height="7.9411612"
-         x="186.59106"
-         y="39.166889" />
+         width="41.727776"
+         height="7.9396129"
+         x="203.00047"
+         y="39.169796" />
       <text
          xml:space="preserve"
          style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-         x="192.59962"
+         x="210.7545"
          y="44.837624"
          id="text2176"><tspan
            sodipodi:role="line"
            id="tspan2174"
-           x="192.59962"
+           x="210.7545"
            y="44.837624"
            style="font-size:4.93889px;stroke-width:0.264583">MIDI Drums</tspan></text>
     </g>
     <g
-       id="g2200"
-       transform="translate(16.404167)">
-      <rect
-         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
-         id="rect2180"
-         width="38.467194"
-         height="7.9411612"
-         x="186.59106"
-         y="51.237473" />
+       id="g3914">
+      <g
+         id="g2200"
+         transform="matrix(1.0847627,0,0,0.99980505,0.59345588,0.01054176)">
+        <rect
+           style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+           id="rect2180"
+           width="38.467194"
+           height="7.9411612"
+           x="186.59106"
+           y="51.237473" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+         x="211.15724"
+         y="56.384678"
+         id="text2184"><tspan
+           sodipodi:role="line"
+           id="tspan2182"
+           x="211.15724"
+           y="56.384678"
+           style="font-size:4.93889px;stroke-width:0.264583">MIDI Organ</tspan></text>
     </g>
-    <text
-       xml:space="preserve"
-       style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-       x="209.40652"
-       y="56.384899"
-       id="text2184"><tspan
-         sodipodi:role="line"
-         id="tspan2182"
-         x="209.40652"
-         y="56.384899"
-         style="font-size:4.93889px;stroke-width:0.264583">MIDI Organ</tspan></text>
-    <rect
-       style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.253672;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
-       id="rect3276"
-       width="38.467194"
-       height="7.9411612"
-       x="202.99522"
-       y="73.078781" />
-    <text
-       xml:space="preserve"
-       style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
-       x="204.27832"
-       y="78.749519"
-       id="text3282"><tspan
-         sodipodi:role="line"
-         id="tspan3280"
-         x="204.27832"
+    <g
+       id="g3908">
+      <rect
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.264179;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none"
+         id="rect3276"
+         width="41.727776"
+         height="7.9396129"
+         x="203.00047"
+         y="73.075073" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.93889px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+         x="206.02904"
          y="78.749519"
-         style="font-size:4.93889px;stroke-width:0.264583">MIDI Instrument</tspan></text>
+         id="text3282"><tspan
+           sodipodi:role="line"
+           id="tspan3280"
+           x="206.02904"
+           y="78.749519"
+           style="font-size:4.93889px;stroke-width:0.264583">MIDI Instrument</tspan></text>
+    </g>
     <text
        xml:space="preserve"
        id="text3308"
